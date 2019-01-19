@@ -13,3 +13,10 @@ class Word:
 
 class ParseError(Exception):
     pass
+
+
+class WordNotFoundError(Exception):
+
+    def __init__(self, message, word):
+        super(Exception, self).__init__(message)
+        self.word = word

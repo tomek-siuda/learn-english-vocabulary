@@ -2,13 +2,17 @@ from bs4 import BeautifulSoup
 import urllib2
 import parsing_tools
 
-from main_classes import ParseError, Word, Ipa
+from main_classes import ParseError, Word, Ipa, WordNotFoundError
 
 
 def load_word(word):
     url = 'https://www.oxfordlearnersdictionaries.com/definition/english/'
     url += word
-    response = urllib2.urlopen(url)
+    try:
+        response = urllib2.urlopen(url)
+    except urllib2.HTTPError, e:
+        if e.code == 404:
+            raise WordNotFoundError('', word)
     html = response.read()
     return parse_html(html)
 
@@ -27,10 +31,23 @@ def parse_html(html):
     word.pos = parsing_tools.find_single_class(header, pos_class).string
 
     prons = parsing_tools.find_all_classes(soup, pron_top_class)
-    print len(prons)
     for pron in prons:
         ipa = Ipa()
         ipa.ipa = parsing_tools.find_single_class(pron, ipa_class).string
+        try:
+            geo = pron['geo']
+        except KeyError:
+            raise ParseError("Can't find 'geo' attribute in a pronunciation class {}".format(str(pron)))
+        if 'br' in geo and 'am' in geo:
+            raise ParseError("Can't decide if IPA is UK or US, geo name: '{}'".format(geo))
+        if 'br' in geo:
+            ipa.region = 'BR'
+        elif 'am' in geo:
+            ipa.region = 'US'
+        else:
+            raise ParseError("Can't decide if IPA is UK or US, geo name: '{}'".format(geo))
         word.ipas.append(ipa)
 
     return word
+
+load_word('switch')
