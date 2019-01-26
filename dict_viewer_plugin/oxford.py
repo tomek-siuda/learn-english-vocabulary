@@ -49,5 +49,3 @@ def parse_html(html):
         word.ipas.append(ipa)
 
     return word
-
-load_word('switch')
