@@ -39,12 +39,26 @@ class Element:
         self.style = style  # type: Style
         self.text = text
 
+    def __unicode__(self):
+        if self.style == Style.NORMAL:
+            return self.text
+        if self.style == Style.BOLD:
+            return u'<b>{}</b>'.format(self.text)
+        if self.style == Style.ITALIC:
+            return u'<i>{}</i>'.format(self.text)
+
 
 class Section:
     def __init__(self):
         self.elements = []   # type: List[str]
         self.type = None  # type: SectionType
         self.audio = None
+
+    def __unicode__(self):
+        result = u''
+        for element in self.elements:
+            result += unicode(element)
+        return result
 
 
 class SectionContainer:
@@ -59,7 +73,7 @@ def ipa_to_section(ipa):
     """
     section = Section()
     section.type = SectionType.PRONUNCIATION
-    section.elements.append(Element('{}: {}'.format(ipa.region, ipa.ipa)))
+    section.elements.append(Element(u'{}: {}'.format(ipa.region, ipa.ipa)))
     return section
 
 

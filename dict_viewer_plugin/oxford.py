@@ -1,3 +1,5 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 from bs4 import BeautifulSoup
 import urllib2
 import parsing_tools
@@ -17,6 +19,11 @@ def load_word(word):
     return parse_html(html)
 
 
+def extract_ipa(content):
+    # IPA content example: 'NAmE//rɪˈmɑːrkəbl//'
+    return content.split(u'/')[2]
+
+
 def parse_html(html):
     word_header_class = 'webtop-g'
     name_class = 'h'
@@ -33,7 +40,8 @@ def parse_html(html):
     prons = parsing_tools.find_all_classes(soup, pron_top_class)
     for pron in prons:
         ipa = Ipa()
-        ipa.ipa = parsing_tools.find_single_class(pron, ipa_class).string
+        ipa_content = parsing_tools.find_single_class(pron, ipa_class)
+        ipa.ipa = extract_ipa(ipa_content.text)
         try:
             geo = pron['geo']
         except KeyError:

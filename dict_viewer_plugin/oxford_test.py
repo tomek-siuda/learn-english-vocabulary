@@ -1,7 +1,10 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 import unittest
 
 from main_classes import Word
-from oxford import parse_html
+from oxford import parse_html, extract_ipa
 
 
 class TestOxford(unittest.TestCase):
@@ -14,3 +17,9 @@ class TestOxford(unittest.TestCase):
             self.assertEqual('noun', word.pos)
             print str(word.ipas)
             self.assertEqual(2, len(word.ipas))
+
+    def test_extract_ipa(self):
+        content = u'NAmE//rɪˈmɑːrkəbl//'
+        extracted = extract_ipa(content)
+        self.assertEqual(u'rɪˈmɑːrkəbl', extracted)
+
