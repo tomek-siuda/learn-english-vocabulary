@@ -1,7 +1,11 @@
+from dict_viewer_plugin import cache
+
+
 class Ipa:
     def __init__(self):
         self.ipa = ''
         self.region = ''
+        self.audio = None  # type: cache.File
 
 
 class Word:
@@ -73,6 +77,7 @@ def ipa_to_section(ipa):
     """
     section = Section()
     section.type = SectionType.PRONUNCIATION
+    section.audio = ipa.audio
     section.elements.append(Element(u'{}: {}'.format(ipa.region, ipa.ipa)))
     return section
 

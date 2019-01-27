@@ -4,16 +4,27 @@ from aqt import mw
 from aqt.utils import showInfo, showWarning
 # import all of the Qt GUI library
 from aqt.qt import *
+import anki
 
 import sys
 import traceback
 
+from dict_viewer_plugin import cache
 from dict_viewer_plugin.main_classes import ParseError, WordNotFoundError, Element, Section, \
     SectionType, SectionContainer
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "dict_viewer_plugin", "site_packages"))
 
 from dict_viewer_plugin.main import load_word
+
+
+def play_sound(sound_file):
+    """
+    :type sound_file: cache.File
+    """
+    path = sound_file.get_absolute_path()
+    anki.sound.clearAudioQueue()
+    anki.sound.play(path)
 
 
 class PluginWindow:
@@ -55,6 +66,12 @@ class PluginWindow:
             label = QLabel()
             label.setText(label_name)
             grid.addWidget(label, 1, 1)
+        if section.audio is not None:
+            button = QPushButton()
+            button.setText('listen')
+            button.clicked.connect(lambda: play_sound(section.audio))
+            grid.addWidget(button, 1, 3)
+
         grid.addWidget(content, 1, 2)
         return grid
 

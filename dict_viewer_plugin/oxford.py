@@ -3,6 +3,7 @@
 from bs4 import BeautifulSoup
 import urllib2
 import parsing_tools
+from dict_viewer_plugin import cache
 
 from main_classes import ParseError, Word, Ipa, WordNotFoundError
 
@@ -36,6 +37,8 @@ def parse_html(html):
     pos_class = 'pos'
     pron_top_class = 'pron-g'
     ipa_class = 'phon'
+    audio_class = 'sound'
+    audio_url_param_name = 'data-src-mp3'
     soup = BeautifulSoup(html, 'html.parser')
 
     header = parsing_tools.find_single_class(soup, word_header_class)
@@ -48,6 +51,9 @@ def parse_html(html):
         ipa = Ipa()
         ipa_content = parsing_tools.find_single_class(pron, ipa_class)
         ipa.ipa = extract_ipa(ipa_content.text)
+        audio_div = parsing_tools.find_single_class(pron, audio_class)
+        audio_url = audio_div[audio_url_param_name]
+        ipa.audio = cache.File(audio_url, 'mp3')
         try:
             geo = pron['geo']
         except KeyError:
