@@ -21,6 +21,12 @@ def load_word(word):
 
 def extract_ipa(content):
     # IPA content example: 'NAmE//rɪˈmɑːrkəbl//'
+    split = content.split(u'/')
+    if len(split) != 5:
+        raise ParseError(u'IPA content format has changed. Length after split should be equal to 5.\n'
+                         u'Content: ' + content)
+    if len(split[2]) == 0:
+        raise ParseError(u'IPA is empty.')
     return content.split(u'/')[2]
 
 
