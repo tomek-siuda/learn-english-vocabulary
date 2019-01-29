@@ -45,8 +45,17 @@ class PluginWindow:
             showWarning('Word not found: {}'.format(e.word))
             return
 
+        grid = self.main_grid.itemAtPosition(5, 1)
+        if grid is not None:
+            for i in reversed(range(grid.count())):
+                for j in reversed(range(grid.itemAt(i).count())):
+                    grid.itemAt(i).itemAt(j).widget().setParent(None)
+        else:
+            grid = QGridLayout()
+            self.main_grid.addLayout(grid, 5, 1)
+
         for i, section in enumerate(section_container.sections):
-            self.main_grid.addLayout(self.section_to_widget(section), i+5, 1)
+            grid.addLayout(self.section_to_widget(section), i, 1)
 
     def section_to_widget(self, section):
         """
@@ -54,6 +63,7 @@ class PluginWindow:
         """
         grid = QGridLayout()
         content = QLabel()
+        content.setStyleSheet("border: 1px solid black")
         content.setText(unicode(section))
         label_name = ''
         if section.type == SectionType.PRONUNCIATION:
@@ -71,6 +81,8 @@ class PluginWindow:
             button.setText('listen')
             button.clicked.connect(lambda: play_sound(section.audio))
             grid.addWidget(button, 1, 3)
+
+        content.setSizePolicy ( QSizePolicy.Fixed, QSizePolicy.Fixed)
 
         grid.addWidget(content, 1, 2)
         return grid
@@ -91,10 +103,13 @@ class PluginWindow:
 
         label = QLabel()
         label.setText("Hello World")
+        label.setStyleSheet("border: 1px solid black")
         grid.addWidget(label, 1, 1)
 
         label2 = QLabel()
         label2.setText("Hello World")
+        label2.setStyleSheet("border: 1px solid black")
+        label2.setSizePolicy ( QSizePolicy.Fixed, QSizePolicy.Fixed)
         grid.addWidget(label2, 2, 2)
 
         button.clicked.connect(lambda: self.clicked(label2, word_line.text()))
