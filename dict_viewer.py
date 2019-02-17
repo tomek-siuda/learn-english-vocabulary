@@ -35,7 +35,7 @@ class PluginWindow:
     def word_changed(self, text):
         pass
 
-    def clicked(self, label, text):
+    def clicked(self, text):
         try:
             section_container = load_word(text)
         except ParseError, e:
@@ -93,26 +93,27 @@ class PluginWindow:
         grid = QGridLayout()
         self.main_grid = grid
 
+        typingGrid = QGridLayout()
+
         button = QPushButton()
-        button.setText('click me')
-        grid.addWidget(button, 1, 3)
+        button.setText('search')
+        button.setSizePolicy ( QSizePolicy.Fixed, QSizePolicy.Fixed)
+        typingGrid.addWidget(button, 1, 2)
 
         word_line = QLineEdit()
         word_line.textChanged.connect(self.word_changed)
-        grid.addWidget(word_line, 1, 2)
+        word_line.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        typingGrid.addWidget(word_line, 1, 1)
 
-        label = QLabel()
-        label.setText("Hello World")
-        label.setStyleSheet("border: 1px solid black")
-        grid.addWidget(label, 1, 1)
+        grid.addLayout(typingGrid, 1, 1)
 
-        label2 = QLabel()
-        label2.setText("Hello World")
-        label2.setStyleSheet("border: 1px solid black")
-        label2.setSizePolicy ( QSizePolicy.Fixed, QSizePolicy.Fixed)
-        grid.addWidget(label2, 2, 2)
+        # auxiliary label keeping the rest of the layout fixed
+        helper = QLabel()
+        helper.setText("")
+        # label3.setStyleSheet("border: 1px solid black")
+        grid.addWidget(helper, 6, 1)
 
-        button.clicked.connect(lambda: self.clicked(label2, word_line.text()))
+        button.clicked.connect(lambda: self.clicked(word_line.text()))
 
         win.setLayout(grid)
         win.setWindowTitle("PyQt")
