@@ -81,6 +81,10 @@ class PluginWindow:
             button.setText('listen')
             button.clicked.connect(lambda: play_sound(section.audio))
             grid.addWidget(button, 1, 3)
+            cb_audio = QCheckBox('copy audio')
+            grid.addWidget(cb_audio, 1, 5)
+        cb = QCheckBox('copy text')
+        grid.addWidget(cb, 1, 4)
 
         content.setSizePolicy ( QSizePolicy.Fixed, QSizePolicy.Fixed)
 
@@ -90,32 +94,31 @@ class PluginWindow:
     def testFunction(self):
         mw.myWidget = win = QWidget()
 
-        grid = QGridLayout()
-        self.main_grid = grid
+        self.main_grid = QGridLayout()
 
-        typingGrid = QGridLayout()
-
-        button = QPushButton()
-        button.setText('search')
-        button.setSizePolicy ( QSizePolicy.Fixed, QSizePolicy.Fixed)
-        typingGrid.addWidget(button, 1, 2)
+        typingGrid = QHBoxLayout()
 
         word_line = QLineEdit()
         word_line.textChanged.connect(self.word_changed)
         word_line.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-        typingGrid.addWidget(word_line, 1, 1)
+        typingGrid.addWidget(word_line)
 
-        grid.addLayout(typingGrid, 1, 1)
+        button = QPushButton()
+        button.setText('search')
+        button.setSizePolicy ( QSizePolicy.Fixed, QSizePolicy.Fixed)
+        typingGrid.addWidget(button)
+
+        self.main_grid.addLayout(typingGrid, 1, 1)
 
         # auxiliary label keeping the rest of the layout fixed
         helper = QLabel()
         helper.setText("")
         # label3.setStyleSheet("border: 1px solid black")
-        grid.addWidget(helper, 6, 1)
+        self.main_grid.addWidget(helper, 6, 1)
 
         button.clicked.connect(lambda: self.clicked(word_line.text()))
 
-        win.setLayout(grid)
+        win.setLayout(self.main_grid)
         win.setWindowTitle("PyQt")
         win.show()
 
