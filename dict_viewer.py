@@ -123,6 +123,7 @@ class PluginWindow:
         self.main_grid.addStretch()
 
         button.clicked.connect(lambda: self.clicked(word_line.text()))
+        word_line.returnPressed.connect(lambda: self.clicked(word_line.text()))
 
         win.setLayout(self.main_grid)
         win.setWindowTitle("PyQt")
