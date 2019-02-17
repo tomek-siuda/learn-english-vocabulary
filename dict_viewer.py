@@ -45,26 +45,21 @@ class PluginWindow:
             showWarning('Word not found: {}'.format(e.word))
             return
 
-        grid = self.main_grid.itemAtPosition(5, 1)
+        grid = self.content_layout
         if grid is not None:
             for i in reversed(range(grid.count())):
                 for j in reversed(range(grid.itemAt(i).count())):
                     grid.itemAt(i).itemAt(j).widget().setParent(None)
-        else:
-            grid = QGridLayout()
-            self.main_grid.addLayout(grid, 5, 1)
 
         for i, section in enumerate(section_container.sections):
-            grid.addLayout(self.section_to_widget(section), i, 1)
+            grid.addLayout(self.section_to_widget(section))
 
     def section_to_widget(self, section):
         """
         :type section: Section
         """
         grid = QGridLayout()
-        content = QLabel()
-        content.setStyleSheet("border: 1px solid black")
-        content.setText(unicode(section))
+
         label_name = ''
         if section.type == SectionType.PRONUNCIATION:
             label_name = 'IPA:'
@@ -75,26 +70,35 @@ class PluginWindow:
         if label_name:
             label = QLabel()
             label.setText(label_name)
+            label.setStyleSheet("border: 1px solid black")
+            label.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
             grid.addWidget(label, 1, 1)
         if section.audio is not None:
             button = QPushButton()
             button.setText('listen')
             button.clicked.connect(lambda: play_sound(section.audio))
+            button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
             grid.addWidget(button, 1, 3)
             cb_audio = QCheckBox('copy audio')
+            cb_audio.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
             grid.addWidget(cb_audio, 1, 5)
         cb = QCheckBox('copy text')
+        cb.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         grid.addWidget(cb, 1, 4)
 
-        content.setSizePolicy ( QSizePolicy.Fixed, QSizePolicy.Fixed)
-
+        content = QLabel()
+        content.setStyleSheet("border: 1px solid black")
+        content.setText(unicode(section))
         grid.addWidget(content, 1, 2)
+
+        # content.setSizePolicy ( QSizePolicy.Fixed, QSizePolicy.Fixed)
+
         return grid
 
     def testFunction(self):
         mw.myWidget = win = QWidget()
 
-        self.main_grid = QGridLayout()
+        self.main_grid = QVBoxLayout()
 
         typingGrid = QHBoxLayout()
 
@@ -108,13 +112,15 @@ class PluginWindow:
         button.setSizePolicy ( QSizePolicy.Fixed, QSizePolicy.Fixed)
         typingGrid.addWidget(button)
 
-        self.main_grid.addLayout(typingGrid, 1, 1)
+        typingGrid.addStretch()
 
-        # auxiliary label keeping the rest of the layout fixed
-        helper = QLabel()
-        helper.setText("")
-        # label3.setStyleSheet("border: 1px solid black")
-        self.main_grid.addWidget(helper, 6, 1)
+        self.main_grid.addLayout(typingGrid)
+        self.main_grid.addWidget(QLabel(''))
+
+        self.content_layout = QVBoxLayout()
+        self.main_grid.addLayout(self.content_layout)
+
+        self.main_grid.addStretch()
 
         button.clicked.connect(lambda: self.clicked(word_line.text()))
 
