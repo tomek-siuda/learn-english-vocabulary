@@ -1,3 +1,5 @@
+import os
+
 from dict_viewer_plugin import cache
 
 
@@ -54,9 +56,11 @@ class Element:
 
 class Section:
     def __init__(self):
-        self.elements = []   # type: List[str]
+        self.elements = []   # type: List[Element]
         self.type = None  # type: SectionType
         self.audio = None
+        self.copy_text = False
+        self.copy_audio = False
 
     def __unicode__(self):
         result = u''
@@ -92,3 +96,15 @@ def word_to_section_container(word):
         container.sections.append(ipa_to_section(ipa))
     return container
 
+
+def section_container_to_text(section_container):
+    """
+    :type section_container: SectionContainer
+    """
+    result = u''
+    for section in section_container.sections:
+        if section.copy_text:
+            result += unicode(section)
+            result += os.linesep
+            result += os.linesep
+    return result

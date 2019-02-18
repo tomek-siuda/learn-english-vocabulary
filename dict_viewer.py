@@ -9,7 +9,7 @@ import anki
 import sys
 import traceback
 
-from dict_viewer_plugin import cache
+from dict_viewer_plugin import cache, main_classes
 from dict_viewer_plugin.main_classes import ParseError, WordNotFoundError, Element, Section, \
     SectionType, SectionContainer
 
@@ -31,9 +31,17 @@ class PluginWindow:
 
     def __init__(self):
         self.main_grid = None
+        self.section_container = None  # type: SectionContainer
 
     def word_changed(self, text):
         pass
+
+    def copy(self):
+        if self.section_container is None:
+            showWarning('Nothing to copy')
+            return
+        text = main_classes.section_container_to_text(self.section_container)
+        showWarning(text)
 
     def clicked(self, text):
         try:
@@ -44,6 +52,8 @@ class PluginWindow:
         except WordNotFoundError, e:
             showWarning('Word not found: {}'.format(e.word))
             return
+
+        self.section_container = section_container
 
         grid = self.content_layout
         if grid is not None:
@@ -81,9 +91,13 @@ class PluginWindow:
             grid.addWidget(button, 1, 3)
             cb_audio = QCheckBox('copy audio')
             cb_audio.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+            cb_audio.setCheckState(Qt.Checked if section.copy_audio else Qt.Unchecked)
+            cb_audio.stateChanged.connect(lambda: self.audio_checkbox(cb_audio, section))
             grid.addWidget(cb_audio, 1, 5)
         cb = QCheckBox('copy text')
         cb.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        cb.setCheckState(Qt.Checked if section.copy_text else Qt.Unchecked)
+        cb.stateChanged.connect(lambda: self.text_checkbox(cb, section))
         grid.addWidget(cb, 1, 4)
 
         content = QLabel()
@@ -94,6 +108,18 @@ class PluginWindow:
         # content.setSizePolicy ( QSizePolicy.Fixed, QSizePolicy.Fixed)
 
         return grid
+
+    def audio_checkbox(self, cb, section):
+        """
+        :type section: Section
+        """
+        section.copy_audio = cb.isChecked()
+
+    def text_checkbox(self, cb, section):
+        """
+        :type section: Section
+        """
+        section.copy_text = cb.isChecked()
 
     def testFunction(self):
         mw.myWidget = win = QWidget()
@@ -120,10 +146,17 @@ class PluginWindow:
         self.content_layout = QVBoxLayout()
         self.main_grid.addLayout(self.content_layout)
 
+        self.main_grid.addWidget(QLabel(''))
+        copy_button = QPushButton()
+        copy_button.setText('copy')
+        copy_button.setSizePolicy ( QSizePolicy.Fixed, QSizePolicy.Fixed)
+        self.main_grid.addWidget(copy_button)
+
         self.main_grid.addStretch()
 
         button.clicked.connect(lambda: self.clicked(word_line.text()))
         word_line.returnPressed.connect(lambda: self.clicked(word_line.text()))
+        copy_button.clicked.connect(lambda: self.copy())
 
         win.setLayout(self.main_grid)
         win.setWindowTitle("PyQt")
