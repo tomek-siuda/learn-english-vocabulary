@@ -58,7 +58,7 @@ class Section:
     def __init__(self):
         self.elements = []   # type: List[Element]
         self.type = None  # type: SectionType
-        self.audio = None
+        self.audio = None  # type: cache.File
         self.copy_text = False
         self.copy_audio = False
 
@@ -98,13 +98,18 @@ def word_to_section_container(word):
     return container
 
 
-def section_container_to_text(section_container):
+def section_container_to_text(section_container, file_saver):
     """
     :type section_container: SectionContainer
     """
     result = u''
     for section in section_container.sections:
-        if section.copy_text:
+        if section.copy_text or section.copy_audio:
             result += unicode(section)
+        if section.copy_audio:
+            fname = file_saver(unicode(section.audio.get_absolute_path()))
+            result += ' [sound:%s]' % fname
+        if section.copy_text or section.copy_audio:
             result += '</br></br>'
+
     return result

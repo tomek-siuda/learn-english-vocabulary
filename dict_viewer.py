@@ -45,7 +45,10 @@ class PluginWindow:
         if self.section_container is None:
             showWarning('Nothing to copy')
             return
-        text = main_classes.section_container_to_text(self.section_container)
+        text = main_classes.section_container_to_text(
+            self.section_container,
+            lambda path: mw.col.media.addFile(path)
+        )
         self.editor.web.eval("setFormat('inserthtml', %s);" % json.dumps(text))
 
     def clicked(self, text):
