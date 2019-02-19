@@ -5,7 +5,7 @@ import urllib2
 import parsing_tools
 from dict_viewer_plugin import cache
 
-from main_classes import ParseError, Word, Ipa, WordNotFoundError
+from main_classes import ParseError, Word, Ipa, WordNotFoundError, Definition, Sentence
 
 
 def load_word(word):
@@ -39,6 +39,10 @@ def parse_html(html):
     ipa_class = 'phon'
     audio_class = 'sound'
     audio_url_param_name = 'data-src-mp3'
+    idioms_parent = 'idm-gs'
+    definition_parent_class = 'sn-g'
+    definition_class = 'def'
+    sentence_class = 'x'
     soup = BeautifulSoup(html, 'html.parser')
 
     header = parsing_tools.find_single_class(soup, word_header_class)
@@ -67,5 +71,22 @@ def parse_html(html):
         else:
             raise ParseError("Can't decide if IPA is UK or US, geo name: '{}'".format(geo))
         word.ipas.append(ipa)
+
+    # remove idiom div, it also has definitions we don't need
+    parsing_tools.find_single_class(soup, idioms_parent).decompose()
+    definitions = parsing_tools.find_all_classes(soup, definition_parent_class)
+    for def_parent in definitions:
+        definition = Definition()
+        definition_header = parsing_tools.find_single_class(
+            def_parent, definition_class)
+        definition.definition = definition_header.text
+
+        sentences = def_parent.find_all(class_=sentence_class)
+        for s in sentences:
+            sentence = Sentence()
+            sentence.content = s.text
+            definition.sentences.append(sentence)
+
+        word.definitions.append(definition)
 
     return word

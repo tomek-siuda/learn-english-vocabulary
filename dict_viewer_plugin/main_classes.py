@@ -10,11 +10,24 @@ class Ipa:
         self.audio = None  # type: cache.File
 
 
+class Sentence:
+    def __init__(self):
+        self.content = ''
+        self.audio = None  # type: cache.File
+
+
+class Definition:
+    def __init__(self):
+        self.definition = ''
+        self.sentences = []  # type: list[Sentence]
+
+
 class Word:
     def __init__(self):
         self.word = ''
         self.pos = ''
         self.ipas = []
+        self.definitions = []  # type: list[Definition]
 
 
 class ParseError(Exception):
@@ -22,7 +35,6 @@ class ParseError(Exception):
 
 
 class WordNotFoundError(Exception):
-
     def __init__(self, message, word):
         super(Exception, self).__init__(message)
         self.word = word
@@ -101,6 +113,27 @@ def word_and_pos_to_section(word, pos):
     return section
 
 
+def definition_to_sections(definition):
+    """
+    :type definition: Definition
+    :rtype: list[Section]
+    """
+    sections = []
+    definition_section = Section()
+    definition_section.type = SectionType.DEFINITION
+    definition_section.elements.append(Element(u'{}'.format(definition.definition), Style.ITALIC))
+    sections.append(definition_section)
+
+    for sentence in definition.sentences:
+        section = Section()
+        section.type = SectionType.SENTENCE
+        section.elements.append(Element(u'{}'.format(sentence.content)))
+        section.audio = sentence.audio
+        sections.append(section)
+
+    return sections
+
+
 def word_to_section_container(word):
     """
     :type word: Word
@@ -110,6 +143,8 @@ def word_to_section_container(word):
     container.sections.append(word_and_pos_to_section(word.word, word.pos))
     for ipa in word.ipas:
         container.sections.append(ipa_to_section(ipa))
+    for definition in word.definitions:
+        container.sections.extend(definition_to_sections(definition))
     return container
 
 
