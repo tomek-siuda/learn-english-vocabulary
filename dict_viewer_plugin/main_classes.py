@@ -82,7 +82,8 @@ def ipa_to_section(ipa):
     section = Section()
     section.type = SectionType.PRONUNCIATION
     section.audio = ipa.audio
-    section.elements.append(Element(u'{}: {}'.format(ipa.region, ipa.ipa)))
+    section.elements.append(Element(u'{}: '.format(ipa.region), Style.NORMAL))
+    section.elements.append(Element(u'/{}/'.format(ipa.ipa), Style.NORMAL))
     return section
 
 
