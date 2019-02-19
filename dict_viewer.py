@@ -1,10 +1,14 @@
 # import the main window object (mw) from aqt
+import json
+
 from aqt import mw
 # import the "show info" tool from utils.py
 from aqt.utils import showInfo, showWarning
 # import all of the Qt GUI library
 from aqt.qt import *
 import anki
+from aqt.editor import Editor
+from anki.hooks import wrap
 
 import sys
 import traceback
@@ -29,9 +33,10 @@ def play_sound(sound_file):
 
 class PluginWindow:
 
-    def __init__(self):
+    def __init__(self, editor):
         self.main_grid = None
         self.section_container = None  # type: SectionContainer
+        self.editor = editor
 
     def word_changed(self, text):
         pass
@@ -41,7 +46,7 @@ class PluginWindow:
             showWarning('Nothing to copy')
             return
         text = main_classes.section_container_to_text(self.section_container)
-        showWarning(text)
+        self.editor.web.eval("setFormat('inserthtml', %s);" % json.dumps(text))
 
     def clicked(self, text):
         try:
@@ -163,7 +168,7 @@ class PluginWindow:
         win.show()
 
 
-plugin_window = PluginWindow()
+plugin_window = PluginWindow(None)
 
 # create a new menu item, "test"
 action = QAction("test", mw)
@@ -171,3 +176,14 @@ action = QAction("test", mw)
 action.triggered.connect(plugin_window.testFunction)
 # and add it to the tools menu
 mw.form.menuTools.addAction(action)
+
+def open_plugin_window(self):
+    plugin_window = PluginWindow(self)
+    plugin_window.testFunction()
+
+def setup_buttons(self):
+    self._addButton("mybutton", lambda s=self: open_plugin_window(self),
+                    text=u"D", tip="dict viewer", key="")
+
+Editor.open_plugin_window = open_plugin_window
+Editor.setupButtons = wrap(Editor.setupButtons, setup_buttons)
