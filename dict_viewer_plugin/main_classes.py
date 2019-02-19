@@ -105,6 +105,5 @@ def section_container_to_text(section_container):
     for section in section_container.sections:
         if section.copy_text:
             result += unicode(section)
-            result += os.linesep
-            result += os.linesep
+            result += '</br></br>'
     return result
