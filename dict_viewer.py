@@ -63,21 +63,21 @@ class PluginWindow:
 
         self.section_container = section_container
 
-        grid = self.content_layout
-        if grid is not None:
-            for i in reversed(range(grid.count())):
-                for j in reversed(range(grid.itemAt(i).count())):
-                    grid.itemAt(i).itemAt(j).widget().setParent(None)
+        content_layout = self.content_layout
+        if content_layout is not None:
+            for i in reversed(range(content_layout.count())):
+                for j in reversed(range(content_layout.itemAt(i).count())):
+                    content_layout.itemAt(i).itemAt(j).widget().setParent(None)
 
+        grid = QGridLayout()
         for i, section in enumerate(section_container.sections):
-            grid.addLayout(self.section_to_widget(section))
+            self.section_to_widget(section, grid, i)
+        content_layout.addLayout(grid)
 
-    def section_to_widget(self, section):
+    def section_to_widget(self, section, grid, row_id):
         """
         :type section: Section
         """
-        grid = QGridLayout()
-
         label_name = ''
         if section.type == SectionType.PRONUNCIATION:
             label_name = 'IPA:'
@@ -85,33 +85,35 @@ class PluginWindow:
             label_name = 'definition:'
         if section.type == SectionType.SENTENCE:
             label_name = 'sentence:'
+        if section.type == SectionType.NAME:
+            label_name = 'word:'
         if label_name:
             label = QLabel()
             label.setText(label_name)
             label.setStyleSheet("border: 1px solid black")
             label.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-            grid.addWidget(label, 1, 1)
+            grid.addWidget(label, row_id, 1)
         if section.audio is not None:
             button = QPushButton()
             button.setText('listen')
             button.clicked.connect(lambda: play_sound(section.audio))
             button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
-            grid.addWidget(button, 1, 3)
+            grid.addWidget(button, row_id, 3)
             cb_audio = QCheckBox('copy audio')
             cb_audio.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
             cb_audio.setCheckState(Qt.Checked if section.copy_audio else Qt.Unchecked)
             cb_audio.stateChanged.connect(lambda: self.audio_checkbox(cb_audio, section))
-            grid.addWidget(cb_audio, 1, 5)
+            grid.addWidget(cb_audio, row_id, 5)
         cb = QCheckBox('copy text')
         cb.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         cb.setCheckState(Qt.Checked if section.copy_text else Qt.Unchecked)
         cb.stateChanged.connect(lambda: self.text_checkbox(cb, section))
-        grid.addWidget(cb, 1, 4)
+        grid.addWidget(cb, row_id, 4)
 
         content = QLabel()
         content.setStyleSheet("border: 1px solid black")
         content.setText(unicode(section))
-        grid.addWidget(content, 1, 2)
+        grid.addWidget(content, row_id, 2)
 
         # content.setSizePolicy ( QSizePolicy.Fixed, QSizePolicy.Fixed)
 

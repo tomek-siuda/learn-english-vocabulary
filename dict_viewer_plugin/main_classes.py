@@ -29,6 +29,7 @@ class WordNotFoundError(Exception):
 
 
 class SectionType:
+    NAME = 0
     DEFINITION = 1
     SENTENCE = 2
     PRONUNCIATION = 3
@@ -87,12 +88,26 @@ def ipa_to_section(ipa):
     return section
 
 
+def word_and_pos_to_section(word, pos):
+    """
+    :type word: unicode
+    :type pos: unicode
+    :rtype: Section
+    """
+    section = Section()
+    section.type = SectionType.NAME
+    section.elements.append(Element(u'{} '.format(word), Style.BOLD))
+    section.elements.append(Element(u'{}'.format(pos), Style.ITALIC))
+    return section
+
+
 def word_to_section_container(word):
     """
     :type word: Word
     :rtype: SectionContainer
     """
     container = SectionContainer()
+    container.sections.append(word_and_pos_to_section(word.word, word.pos))
     for ipa in word.ipas:
         container.sections.append(ipa_to_section(ipa))
     return container
