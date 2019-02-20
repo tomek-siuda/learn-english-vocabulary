@@ -43,7 +43,7 @@ def parse_html(html):
     definition_parent_class = 'sn-g'
     definition_class = 'def'
     sentence_class = 'x'
-    soup = BeautifulSoup(html, 'html.parser')
+    soup = parsing_tools.html_to_soup(html)
 
     header = parsing_tools.find_single_class(soup, word_header_class)
     word = Word()

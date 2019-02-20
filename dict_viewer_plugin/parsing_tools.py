@@ -1,4 +1,13 @@
+from bs4 import BeautifulSoup
+
 from main_classes import ParseError
+
+
+def html_to_soup(html):
+    """
+    :type html: str
+    """
+    return BeautifulSoup(html, 'html.parser')
 
 
 def find_all_classes(soup, class_name, expected_length=0):
