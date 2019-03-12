@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import unittest
-
-from dict_viewer_plugin import parsing_tools, longman
+import parsing_tools
+import longman
 from main_classes import WordNotFoundError
 
 
