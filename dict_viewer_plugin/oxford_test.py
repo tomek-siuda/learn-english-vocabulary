@@ -15,7 +15,6 @@ class TestOxford(unittest.TestCase):
             word = parse_html(data)  # type: Word
             self.assertEqual('dog', word.word)
             self.assertEqual('noun', word.pos)
-            print str(word.ipas)
             self.assertEqual(2, len(word.ipas))
 
     def test_extract_ipa(self):

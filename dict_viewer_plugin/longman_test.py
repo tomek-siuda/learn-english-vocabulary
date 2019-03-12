@@ -21,3 +21,10 @@ class TestLongman(unittest.TestCase):
             data = f.read()
         soup = parsing_tools.html_to_soup(data)
         self.assertTrue(longman.valid(soup))
+
+    def test_parse_html(self):
+        with open("test_data/longman/dog.html") as f:
+            data = f.read()
+            word = longman.parse_html(data)  # type: Word
+            self.assertEqual('dog', word.word)
+            self.assertEqual('noun', word.pos)
