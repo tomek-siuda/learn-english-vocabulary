@@ -53,7 +53,7 @@ def extract_ipa(word_soup, region):
         audio_class = us_ipa_audio_class
 
     ipa = Ipa()
-    ipa.ipa = parsing_tools.find_single_class(word_soup, ipa_class).text.strip()
+    ipa.ipa = parsing_tools.find_single_class(word_soup, ipa_class).text.strip().replace(u'/', '')
     audio_div = parsing_tools.find_single_class(word_soup, audio_class)
     audio_url = audio_div[audio_url_param_name]
     ipa.audio = cache.File(audio_url, 'mp3')
@@ -106,6 +106,3 @@ def parse_html(html):
             extract_definition(subdef, word_object)
 
     return word_object
-
-
-
