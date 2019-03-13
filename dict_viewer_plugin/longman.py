@@ -8,6 +8,17 @@ import cache
 from main_classes import ParseError, Word, Ipa, WordNotFoundError, Definition, Sentence
 
 
+word_section_class = 'dictentry'
+name_class = 'HYPHENATION'
+pos_class = 'POS'
+definition_parent_class = 'Sense'
+subdefinition_parent_class = 'Subsense'
+definition_class = 'DEF'
+sentence_class = 'EXAMPLE'
+sentence_audio_class = 'exafile'
+audio_url_param_name = 'data-src-mp3'
+
+
 def load_word(word):
     url = 'https://www.ldoceonline.com/dictionary/'
     url += word
@@ -50,16 +61,29 @@ def extract_ipa(word_soup, region):
     return ipa
 
 
-def parse_html(html):
-    word_section_class = 'dictentry'
-    name_class = 'HYPHENATION'
-    pos_class = 'POS'
-    definition_parent_class = 'Sense'
-    definition_class = 'DEF'
-    sentence_class = 'EXAMPLE'
-    sentence_audio_class = 'exafile'
-    audio_url_param_name = 'data-src-mp3'
+def extract_definition(def_parent, word_object):
+    definition = Definition()
+    try:
+        definition.definition = parsing_tools.find_single_class(
+            def_parent, definition_class).text
+    except ParseError:
+        # Can't find the definition, it's probably just a link to another page
+        return None
 
+    sentences = def_parent.find_all(class_=sentence_class)
+    for s in sentences:
+        sentence = Sentence()
+        sentence.content = s.text.strip()
+        audio = s.find(class_=sentence_audio_class)
+        if audio:
+            audio_url = audio[audio_url_param_name]
+            sentence.audio = cache.File(audio_url, 'mp3')
+        definition.sentences.append(sentence)
+
+        word_object.definitions.append(definition)
+
+
+def parse_html(html):
     soup = parsing_tools.html_to_soup(html)
     valid(soup)
     word_object = Word()
@@ -76,25 +100,10 @@ def parse_html(html):
 
     definitions = parsing_tools.find_all_classes(word, definition_parent_class)
     for def_parent in definitions:
-        definition = Definition()
-        try:
-            definition.definition = parsing_tools.find_single_class(
-                def_parent, definition_class).text
-        except ParseError:
-            # Can't find the definition, it's probably just a link to another page
-            continue
-
-        sentences = def_parent.find_all(class_=sentence_class)
-        for s in sentences:
-            sentence = Sentence()
-            sentence.content = s.text.strip()
-            audio = s.find(class_=sentence_audio_class)
-            if audio:
-                audio_url = audio[audio_url_param_name]
-                sentence.audio = cache.File(audio_url, 'mp3')
-            definition.sentences.append(sentence)
-
-        word_object.definitions.append(definition)
+        extract_definition(def_parent, word_object)
+        subdefinitions = def_parent.find_all(class_=subdefinition_parent_class)
+        for subdef in subdefinitions:
+            extract_definition(subdef, word_object)
 
     return word_object
 
