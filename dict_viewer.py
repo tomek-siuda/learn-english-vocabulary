@@ -13,7 +13,7 @@ from anki.hooks import wrap
 import sys
 import traceback
 
-from dict_viewer_plugin import cache, main_classes
+from dict_viewer_plugin import cache, main_classes, frequency_list
 from dict_viewer_plugin.main_classes import ParseError, WordNotFoundError, Element, Section, \
     SectionType, SectionContainer
 
@@ -36,6 +36,7 @@ class PluginWindow:
     def __init__(self, editor):
         self.main_grid = None
         self.section_container = None  # type: SectionContainer
+        self.frequency_position = None
         self.editor = editor
 
     def word_changed(self, text):
@@ -61,18 +62,31 @@ class PluginWindow:
             showWarning('Word not found: {}'.format(e.word))
             return
 
+        self.frequency_position = frequency_list.get_position(text)
         self.section_container = section_container
 
         content_layout = self.content_layout
         if content_layout is not None:
             for i in reversed(range(content_layout.count())):
+                try:
+                    # Widgets don't have the count method
+                    content_layout.itemAt(i).count()
+                except AttributeError:
+                    content_layout.itemAt(i).widget().setParent(None)
+                    continue
                 for j in reversed(range(content_layout.itemAt(i).count())):
                     content_layout.itemAt(i).itemAt(j).widget().setParent(None)
+
+        content_layout.addWidget(self.create_frequency_widget())
+        content_layout.addWidget(QLabel(''))
 
         grid = QGridLayout()
         for i, section in enumerate(section_container.sections):
             self.section_to_widget(section, grid, i)
         content_layout.addLayout(grid)
+
+    def create_frequency_widget(self):
+        return QLabel('Frequency position: ' + str(self.frequency_position))
 
     def section_to_widget(self, section, grid, row_id):
         """

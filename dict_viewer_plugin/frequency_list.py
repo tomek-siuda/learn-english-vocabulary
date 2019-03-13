@@ -1,6 +1,8 @@
+import os
+
 word_dict = {}
 
-with open('files/en_50k 2016.txt') as f:
+with open(os.path.join(os.path.dirname(__file__), "files", "en_50k 2016.txt")) as f:
     i = 1
     for line in f:
         word_dict[line.split()[0]] = i
