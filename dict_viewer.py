@@ -84,7 +84,7 @@ class PluginWindow:
         if section.type == SectionType.DEFINITION:
             label_name = 'definition:'
         if section.type == SectionType.SENTENCE:
-            label_name = 'sentence:'
+            label_name = ''
         if section.type == SectionType.NAME:
             label_name = 'word:'
         if label_name:
