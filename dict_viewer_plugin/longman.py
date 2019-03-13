@@ -92,7 +92,7 @@ def parse_html(html):
     if len(words) == 0:
         raise ParseError("Can't find any '{}' classes.".format(word_section_class))
     word = words[0]
-    word_object.word = parsing_tools.find_single_class(word, name_class).string
+    word_object.word = parsing_tools.find_single_class(word, name_class).string.replace(u'‧', u'')
     word_object.pos = parsing_tools.find_single_class(word, pos_class).string.strip()
 
     word_object.ipas.append(extract_ipa(word, 'br'))
