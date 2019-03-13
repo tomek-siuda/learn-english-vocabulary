@@ -68,7 +68,7 @@ def extract_definition(def_parent, word_object):
             def_parent, definition_class).text
     except ParseError:
         # Can't find the definition, it's probably just a link to another page
-        return None
+        return
 
     sentences = def_parent.find_all(class_=sentence_class)
     for s in sentences:
@@ -80,7 +80,7 @@ def extract_definition(def_parent, word_object):
             sentence.audio = cache.File(audio_url, 'mp3')
         definition.sentences.append(sentence)
 
-        word_object.definitions.append(definition)
+    word_object.definitions.append(definition)
 
 
 def parse_html(html):
