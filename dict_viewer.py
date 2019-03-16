@@ -227,7 +227,7 @@ class PluginWindow:
 
         win.setLayout(self.main_grid)
         win.setWindowTitle("PyQt")
-        win.show()
+        win.showMaximized()
 
 
 plugin_window = PluginWindow(None)
