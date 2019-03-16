@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 # import the main window object (mw) from aqt
 import json
 
@@ -88,8 +91,13 @@ class PluginWindow:
         content_layout.addWidget(QLabel(''))
 
         grid = QGridLayout()
+        additional_rows = 0
         for i, section in enumerate(section_container.sections):
-            self.section_to_widget(section, grid, i)
+            if section.type == SectionType.NAME and i > 0:
+                empty_row = QLabel()
+                grid.addWidget(empty_row, i + additional_rows, 2)
+                additional_rows += 1
+            self.section_to_widget(section, grid, i + additional_rows)
         grid.setColumnStretch(10, 1)
         content_layout.addLayout(grid)
         content_layout.addStretch()
@@ -113,7 +121,7 @@ class PluginWindow:
         if label_name:
             label = QLabel()
             label.setText(label_name)
-            label.setStyleSheet("border: 1px solid black")
+            # label.setStyleSheet("border: 1px solid black")
             label.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
             grid.addWidget(label, row_id, 1)
         if section.audio is not None:
@@ -133,17 +141,26 @@ class PluginWindow:
         cb.stateChanged.connect(lambda: self.text_checkbox(cb, section))
         grid.addWidget(cb, row_id, 4)
 
+        content_text = unicode(section)
+        content_style = (
+            "border: 0px solid black;"
+            "background-color: white;"
+            "font-size: 16px;"
+            "padding: 5px;"
+        )
+        if section.type == SectionType.SENTENCE:
+            content_text = u'• ' + content_text
+            content_style += "margin-left: 10px;"
+        if section.type == SectionType.PRONUNCIATION:
+            content_style += "font-size: 12px;"
+
         content = QLabel()
-        content.setFixedWidth(400)
+        content.setFixedWidth(900)
         content.setWordWrap(True)
-        content.setStyleSheet("border: 1px solid black")
-        content.setText(unicode(section))
+        content.setStyleSheet(content_style)
+        content.setText(content_text)
 
         grid.addWidget(content, row_id, 2)
-
-        # content.setSizePolicy ( QSizePolicy.Fixed, QSizePolicy.Fixed)
-
-        return grid
 
     def audio_checkbox(self, cb, section):
         """
