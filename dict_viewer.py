@@ -164,11 +164,22 @@ class PluginWindow:
 
         typingGrid.addStretch()
 
+
         self.main_grid.addLayout(typingGrid)
         self.main_grid.addWidget(QLabel(''))
 
         self.content_layout = QVBoxLayout()
-        self.main_grid.addLayout(self.content_layout)
+        content_widget = QWidget()
+        content_widget.setLayout(self.content_layout)
+
+        scroll = QScrollArea()
+        scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        scroll.setWidgetResizable(True)
+        scroll.setWidget(content_widget)
+
+        self.main_grid.addWidget(scroll)
+
 
         self.main_grid.addWidget(QLabel(''))
         copy_button = QPushButton()
