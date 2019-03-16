@@ -90,6 +90,7 @@ class PluginWindow:
         grid = QGridLayout()
         for i, section in enumerate(section_container.sections):
             self.section_to_widget(section, grid, i)
+        grid.setColumnStretch(10, 1)
         content_layout.addLayout(grid)
         content_layout.addStretch()
 
@@ -133,8 +134,11 @@ class PluginWindow:
         grid.addWidget(cb, row_id, 4)
 
         content = QLabel()
+        content.setFixedWidth(400)
+        content.setWordWrap(True)
         content.setStyleSheet("border: 1px solid black")
         content.setText(unicode(section))
+
         grid.addWidget(content, row_id, 2)
 
         # content.setSizePolicy ( QSizePolicy.Fixed, QSizePolicy.Fixed)
