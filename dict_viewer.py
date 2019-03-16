@@ -72,10 +72,17 @@ class PluginWindow:
                     # Widgets don't have the count method
                     content_layout.itemAt(i).count()
                 except AttributeError:
-                    content_layout.itemAt(i).widget().setParent(None)
+                    widget = content_layout.itemAt(i).widget()
+                    if widget:
+                        widget.setParent(None)
+                    else:
+                        # Workaround for removing QSpacerItem
+                        content_layout.removeItem(content_layout.itemAt(i))
                     continue
                 for j in reversed(range(content_layout.itemAt(i).count())):
-                    content_layout.itemAt(i).itemAt(j).widget().setParent(None)
+                    widget = content_layout.itemAt(i).itemAt(j).widget()
+                    if widget:
+                        widget.setParent(None)
 
         content_layout.addWidget(self.create_frequency_widget())
         content_layout.addWidget(QLabel(''))
@@ -84,6 +91,7 @@ class PluginWindow:
         for i, section in enumerate(section_container.sections):
             self.section_to_widget(section, grid, i)
         content_layout.addLayout(grid)
+        content_layout.addStretch()
 
     def create_frequency_widget(self):
         return QLabel('Frequency position: ' + str(self.frequency_position))
