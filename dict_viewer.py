@@ -150,7 +150,8 @@ class PluginWindow:
         )
         if section.type == SectionType.SENTENCE:
             content_text = u'• ' + content_text
-            content_style += "margin-left: 10px;"
+        if section.type in (SectionType.SENTENCE, SectionType.PRONUNCIATION):
+            content_style += "margin-left: 20px;"
         if section.type == SectionType.PRONUNCIATION:
             content_style += "font-size: 12px;"
 
@@ -158,6 +159,7 @@ class PluginWindow:
         content.setFixedWidth(900)
         content.setWordWrap(True)
         content.setStyleSheet(content_style)
+        content.setTextInteractionFlags(Qt.TextSelectableByMouse)
         content.setText(content_text)
 
         grid.addWidget(content, row_id, 2)
