@@ -167,7 +167,7 @@ class PluginWindow:
 
         button = QPushButton()
         button.setText('search')
-        button.setSizePolicy ( QSizePolicy.Fixed, QSizePolicy.Fixed)
+        button.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
         typingGrid.addWidget(button)
 
         typingGrid.addStretch()
@@ -185,6 +185,7 @@ class PluginWindow:
         scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         scroll.setWidgetResizable(True)
         scroll.setWidget(content_widget)
+        scroll.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
         self.main_grid.addWidget(scroll)
 
@@ -195,7 +196,7 @@ class PluginWindow:
         copy_button.setSizePolicy ( QSizePolicy.Fixed, QSizePolicy.Fixed)
         self.main_grid.addWidget(copy_button)
 
-        self.main_grid.addStretch()
+        # self.main_grid.addStretch()
 
         button.clicked.connect(lambda: self.clicked(word_line.text()))
         word_line.returnPressed.connect(lambda: self.clicked(word_line.text()))
