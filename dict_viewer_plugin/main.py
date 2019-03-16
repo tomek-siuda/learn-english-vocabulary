@@ -11,5 +11,5 @@ def load_word(word_str):
     """
     if not word_str.strip():
         raise ParseError('Word is empty.')
-    word = longman.load_word(word_str)
-    return main_classes.word_to_section_container(word)
+    words = longman.load_word(word_str)
+    return main_classes.words_to_section_container(words)

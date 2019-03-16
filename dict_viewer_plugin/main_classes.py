@@ -134,17 +134,18 @@ def definition_to_sections(definition):
     return sections
 
 
-def word_to_section_container(word):
+def words_to_section_container(words):
     """
-    :type word: Word
+    :type words: list of Word
     :rtype: SectionContainer
     """
     container = SectionContainer()
-    container.sections.append(word_and_pos_to_section(word.word, word.pos))
-    for ipa in word.ipas:
-        container.sections.append(ipa_to_section(ipa))
-    for definition in word.definitions:
-        container.sections.extend(definition_to_sections(definition))
+    for word in words:
+        container.sections.append(word_and_pos_to_section(word.word, word.pos))
+        for ipa in word.ipas:
+            container.sections.append(ipa_to_section(ipa))
+        for definition in word.definitions:
+            container.sections.extend(definition_to_sections(definition))
     return container
 
 

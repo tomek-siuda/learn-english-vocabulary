@@ -9,6 +9,7 @@ from main_classes import ParseError, Word, Ipa, WordNotFoundError, Definition, S
 
 
 word_section_class = 'dictentry'
+word_head_class = 'Head'  # comprises Word, POS, IPA
 name_class = 'HYPHENATION'
 pos_class = 'POS'
 definition_parent_class = 'Sense'
@@ -53,11 +54,17 @@ def extract_ipa(word_soup, region):
         audio_class = us_ipa_audio_class
 
     ipa = Ipa()
-    ipa.ipa = parsing_tools.find_single_class(word_soup, ipa_class).text.strip().replace(u'/', '')
-    audio_div = parsing_tools.find_single_class(word_soup, audio_class)
+    ipa.region = region
+    try:
+        ipa.ipa = parsing_tools.find_single_class(word_soup, ipa_class).text.strip().replace(u'/', '')
+    except ParseError:
+        ipa.ipa = ''
+    try:
+        audio_div = parsing_tools.find_single_class(word_soup, audio_class)
+    except ParseError:
+        return ipa
     audio_url = audio_div[audio_url_param_name]
     ipa.audio = cache.File(audio_url, 'mp3')
-    ipa.region = region
     return ipa
 
 
@@ -86,23 +93,30 @@ def extract_definition(def_parent, word_object):
 def parse_html(html):
     soup = parsing_tools.html_to_soup(html)
     valid(soup)
-    word_object = Word()
+    word_objects = []
 
     words = soup.find_all(class_=word_section_class)
     if len(words) == 0:
         raise ParseError("Can't find any '{}' classes.".format(word_section_class))
-    word = words[0]
-    word_object.word = parsing_tools.find_single_class(word, name_class).string.replace(u'‧', u'')
-    word_object.pos = parsing_tools.find_single_class(word, pos_class).string.strip()
+    for word in words:
+        word_head = parsing_tools.find_single_class(word, word_head_class)
+        word_object = Word()
+        word_object.word = parsing_tools.find_single_class(word_head, name_class).string.replace(u'‧', u'')
+        try:
+            word_object.pos = parsing_tools.find_single_class(word_head, pos_class).string.strip()
+        except ParseError:
+            word_object.pos = 'UNDEFINED'
 
-    word_object.ipas.append(extract_ipa(word, 'br'))
-    word_object.ipas.append(extract_ipa(word, 'us'))
+        word_object.ipas.append(extract_ipa(word_head, 'br'))
+        word_object.ipas.append(extract_ipa(word_head, 'us'))
 
-    definitions = parsing_tools.find_all_classes(word, definition_parent_class)
-    for def_parent in definitions:
-        extract_definition(def_parent, word_object)
-        subdefinitions = def_parent.find_all(class_=subdefinition_parent_class)
-        for subdef in subdefinitions:
-            extract_definition(subdef, word_object)
+        definitions = parsing_tools.find_all_classes(word, definition_parent_class)
+        for def_parent in definitions:
+            extract_definition(def_parent, word_object)
+            subdefinitions = def_parent.find_all(class_=subdefinition_parent_class)
+            for subdef in subdefinitions:
+                extract_definition(subdef, word_object)
 
-    return word_object
+        word_objects.append(word_object)
+
+    return word_objects
