@@ -9,15 +9,26 @@ from main_classes import ParseError, Word, Ipa, WordNotFoundError, Definition, S
 
 
 def load_word(word):
-    url = 'https://www.oxfordlearnersdictionaries.com/definition/english/'
-    url += word
-    try:
-        response = urllib2.urlopen(url)
-    except urllib2.HTTPError, e:
-        if e.code == 404:
-            raise WordNotFoundError('', word)
-    html = response.read()
-    return parse_html(html)
+    main_url = 'https://www.oxfordlearnersdictionaries.com/definition/english/'
+
+    def download(url):
+        try:
+            response = urllib2.urlopen(url)
+        except urllib2.HTTPError, e:
+            if e.code == 404:
+                raise WordNotFoundError('', word)
+            raise e
+        return response.read()
+
+    html = download(main_url + word)
+    words = [parse_html(html)]
+    for i in range(2, 10):
+        try:
+            html = download(main_url + word + '_' + str(i))
+        except WordNotFoundError:
+            break
+        words.append(parse_html(html))
+    return words
 
 
 def extract_ipa(content):
@@ -35,6 +46,7 @@ def parse_html(html):
     word_header_class = 'webtop-g'
     name_class = 'h'
     pos_class = 'pos'
+    pron_section_class = 'vp-g'
     pron_top_class = 'pron-g'
     ipa_class = 'phon'
     audio_class = 'sound'
@@ -70,6 +82,11 @@ def parse_html(html):
             ipa.region = 'US'
         else:
             raise ParseError("Can't decide if IPA is UK or US, geo name: '{}'".format(geo))
+        pron_section = pron.find_parent(class_=pron_section_class)
+        if pron_section:
+            description_words = pron_section.find(class_='vp').text.split(' ')
+            description_words[-1] = '<b>' + description_words[-1] + '</b>'
+            ipa.description = ' '.join(description_words)
         word.ipas.append(ipa)
 
     # remove idiom div, it also has definitions we don't need

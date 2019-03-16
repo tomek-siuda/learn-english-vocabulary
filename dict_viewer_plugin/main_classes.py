@@ -7,6 +7,7 @@ class Ipa:
     def __init__(self):
         self.ipa = ''
         self.region = ''
+        self.description = ''
         self.audio = None  # type: cache.File
 
 
@@ -95,6 +96,7 @@ def ipa_to_section(ipa):
     section = Section()
     section.type = SectionType.PRONUNCIATION
     section.audio = ipa.audio
+    section.elements.append(Element(u'{} '.format(ipa.description)))
     section.elements.append(Element(u'{}: '.format(ipa.region), Style.NORMAL))
     if ipa.ipa != '':
         section.elements.append(Element(u'/{}/'.format(ipa.ipa), Style.NORMAL))
