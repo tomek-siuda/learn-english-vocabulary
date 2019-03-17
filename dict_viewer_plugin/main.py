@@ -17,6 +17,7 @@ def load_word(word_str):
     words.extend(load_from_dict(longman, word_str, 'Longman'))
     if len(words) == 0:
         raise WordNotFoundError('')
+    words.sort(key=lambda w: w.pos)
     return words
 
 
