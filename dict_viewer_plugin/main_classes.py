@@ -20,6 +20,7 @@ class Sentence:
 class Definition:
     def __init__(self):
         self.definition = ''
+        self.definition_additional = ''
         self.sentences = []  # type: list[Sentence]
 
 
@@ -49,6 +50,7 @@ class SectionType:
     DEFINITION = 1
     SENTENCE = 2
     PRONUNCIATION = 3
+    DEFINITION_TYPE = 4
 
 
 class Style:
@@ -126,6 +128,13 @@ def definition_to_sections(definition):
     :rtype: list[Section]
     """
     sections = []
+
+    if definition.definition_additional:
+        definition_type_section = Section()
+        definition_type_section.type = SectionType.DEFINITION_TYPE
+        definition_type_section.elements.append(Element(u'{}'.format(definition.definition_additional), Style.ITALIC))
+        sections.append(definition_type_section)
+
     definition_section = Section()
     definition_section.type = SectionType.DEFINITION
     definition_section.elements.append(Element(u'{}'.format(definition.definition), Style.ITALIC))

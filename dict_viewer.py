@@ -113,8 +113,9 @@ class PluginWindow:
         additional_rows = 0
         for i, section in enumerate(self.section_container.sections):
             if section.type == SectionType.NAME and i > 0:
-                empty_row = QLabel()
-                grid.addWidget(empty_row, i + additional_rows, 2)
+                grid.addWidget(QLabel(), i + additional_rows, 2)
+                additional_rows += 1
+                grid.addWidget(QLabel(), i + additional_rows, 2)
                 additional_rows += 1
             self.section_to_widget(section, grid, i + additional_rows)
         grid.setColumnStretch(10, 1)
@@ -150,6 +151,8 @@ class PluginWindow:
         if section.type == SectionType.PRONUNCIATION:
             label_name = ''
         if section.type == SectionType.DEFINITION:
+            label_name = ''
+        if section.type == SectionType.DEFINITION_TYPE:
             label_name = ''
         if section.type == SectionType.SENTENCE:
             label_name = ''
@@ -191,6 +194,8 @@ class PluginWindow:
             content_style += "margin-left: 20px;"
         if section.type == SectionType.PRONUNCIATION:
             content_style += "font-size: 12px;"
+        if section.type == SectionType.DEFINITION_TYPE:
+            content_style += "font-size: 12px; background-color: transparent;"
 
         content = QLabel()
         content.setFixedWidth(900)

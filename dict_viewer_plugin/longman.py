@@ -16,6 +16,7 @@ pos_additional_class = 'GRAM'
 definition_parent_class = 'Sense'
 subdefinition_parent_class = 'Subsense'
 definition_class = 'DEF'
+definition_additional_class = 'GRAM'
 sentence_class = 'EXAMPLE'
 sentence_audio_class = 'exafile'
 audio_url_param_name = 'data-src-mp3'
@@ -80,6 +81,11 @@ def extract_definition(def_parent, word_object):
     except ParseError:
         # Can't find the definition, it's probably just a link to another page
         return
+    try:
+        definition.definition_additional = parsing_tools.find_single_class(
+            def_parent, definition_additional_class).text
+    except ParseError:
+        definition.definition_additional = ''
 
     sentences = def_parent.find_all(class_=sentence_class)
     for s in sentences:
