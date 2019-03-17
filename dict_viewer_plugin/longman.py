@@ -12,6 +12,7 @@ word_section_class = 'dictentry'
 word_head_class = 'Head'  # comprises Word, POS, IPA
 name_class = 'HYPHENATION'
 pos_class = 'POS'
+pos_additional_class = 'GRAM'
 definition_parent_class = 'Sense'
 subdefinition_parent_class = 'Subsense'
 definition_class = 'DEF'
@@ -112,6 +113,11 @@ def parse_html(html):
             word_object.pos = parsing_tools.find_single_class(word_head, pos_class).string.strip()
         except ParseError:
             word_object.pos = 'UNDEFINED'
+        try:
+            word_object.pos_additional = parsing_tools\
+                .find_single_class(word_head, pos_additional_class).text.strip()
+        except ParseError:
+            word_object.pos_additional = ''
 
         word_object.ipas.append(extract_ipa(word_head, 'br'))
         word_object.ipas.append(extract_ipa(word_head, 'us'))

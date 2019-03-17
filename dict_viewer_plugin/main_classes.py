@@ -29,6 +29,7 @@ class Word:
         self.source = ''
         self.url = ''
         self.pos = ''
+        self.pos_additional = ''
         self.ipas = []
         self.definitions = []  # type: list[Definition]
 
@@ -106,16 +107,16 @@ def ipa_to_section(ipa):
     return section
 
 
-def word_and_pos_to_section(word, pos):
+def word_and_pos_to_section(word):
     """
-    :type word: unicode
-    :type pos: unicode
+    :type word: Word
     :rtype: Section
     """
     section = Section()
     section.type = SectionType.NAME
-    section.elements.append(Element(u'{} '.format(word), Style.BOLD))
-    section.elements.append(Element(u'{}'.format(pos), Style.ITALIC))
+    section.elements.append(Element(u'{} '.format(word.word), Style.BOLD))
+    section.elements.append(Element(u'{} '.format(word.pos), Style.ITALIC))
+    section.elements.append(Element(u'{} '.format(word.pos_additional), Style.ITALIC))
     return section
 
 
@@ -148,7 +149,7 @@ def words_to_section_container(words):
     container = SectionContainer()
     for word in words:
         sections = []
-        sections.append(word_and_pos_to_section(word.word, word.pos))
+        sections.append(word_and_pos_to_section(word))
         for ipa in word.ipas:
             sections.append(ipa_to_section(ipa))
         for definition in word.definitions:
