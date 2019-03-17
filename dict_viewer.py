@@ -41,6 +41,7 @@ class PluginWindow:
         self.section_container = None  # type: SectionContainer
         self.frequency_position = None
         self.editor = editor
+        self.word = ''
 
     def word_changed(self, text):
         pass
@@ -51,7 +52,8 @@ class PluginWindow:
             return
         text = main_classes.section_container_to_text(
             self.section_container,
-            lambda path: mw.col.media.addFile(path)
+            lambda path: mw.col.media.addFile(path),
+            self.word
         )
         self.editor.web.eval("setFormat('inserthtml', %s);" % json.dumps(text))
         if self.win:
@@ -63,6 +65,7 @@ class PluginWindow:
         except WordNotFoundError, e:
             return
 
+        self.word = text
         self.section_container = main_classes.words_to_section_container(words)
         self.frequency_position = frequency_list.get_position(text)
 

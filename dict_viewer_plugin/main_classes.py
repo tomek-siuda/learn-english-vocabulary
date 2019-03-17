@@ -1,4 +1,5 @@
 import os
+import re
 
 from dict_viewer_plugin import cache
 
@@ -169,7 +170,12 @@ def words_to_section_container(words):
     return container
 
 
-def section_container_to_text(section_container, file_saver):
+def add_bold_tags(sentence, words):
+    r = re.compile(r'(\s*)((?:\s*\b(?:{})\b)+)'.format('|'.join(words)), re.I)
+    return r.sub(r'\1<b>\2</b>', sentence)
+
+
+def section_container_to_text(section_container, file_saver, word_to_bold):
     """
     :type section_container: SectionContainer
     """
@@ -178,6 +184,18 @@ def section_container_to_text(section_container, file_saver):
     for i, section in enumerate(sections):
         if section.type == SectionType.DEFINITION:
             result += u"<i>{}</i>".format(unicode(section))
+        if section.type == SectionType.SENTENCE:
+            result += add_bold_tags(
+                unicode(section),
+                [
+                    word_to_bold,
+                    word_to_bold + 's',
+                    word_to_bold+'ing',
+                    word_to_bold[:-1] + 'ing',
+                    word_to_bold+'ed',
+                    word_to_bold+'d'
+                ]
+            )
         else:
             result += unicode(section)
 
