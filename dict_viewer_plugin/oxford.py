@@ -59,6 +59,7 @@ def parse_html(html):
 
     header = parsing_tools.find_single_class(soup, word_header_class)
     word = Word()
+    word.source = 'Oxford'
     word.word = parsing_tools.find_single_class(header, name_class).string
     word.pos = parsing_tools.find_single_class(header, pos_class).string
 

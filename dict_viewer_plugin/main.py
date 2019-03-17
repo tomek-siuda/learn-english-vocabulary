@@ -1,14 +1,14 @@
 import oxford
 import main_classes
 import longman
-from main_classes import ParseError, WordNotFoundError
+from main_classes import ParseError, WordNotFoundError, Word
 from aqt.utils import showInfo, showWarning
 
 
 def load_word(word_str):
     """
     :type word_str: str
-    :rtype: SectionContainer
+    :rtype: list of Word
     """
     if not word_str.strip():
         raise ParseError('Word is empty.')
@@ -17,7 +17,7 @@ def load_word(word_str):
     words.extend(load_from_dict(longman, word_str, 'Longman'))
     if len(words) == 0:
         raise WordNotFoundError('')
-    return main_classes.words_to_section_container(words)
+    return words
 
 
 def load_from_dict(module, word, module_name):

@@ -18,7 +18,7 @@ import traceback
 
 from dict_viewer_plugin import cache, main_classes, frequency_list
 from dict_viewer_plugin.main_classes import ParseError, WordNotFoundError, Element, Section, \
-    SectionType, SectionContainer
+    SectionType, SectionContainer, Word
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "dict_viewer_plugin", "site_packages"))
 
@@ -57,12 +57,12 @@ class PluginWindow:
 
     def clicked(self, text):
         try:
-            section_container = load_word(text)
+            words = load_word(text)
         except WordNotFoundError, e:
             return
 
+        self.section_container = main_classes.words_to_section_container(words)
         self.frequency_position = frequency_list.get_position(text)
-        self.section_container = section_container
 
         content_layout = self.content_layout
         if content_layout is not None:
@@ -88,7 +88,7 @@ class PluginWindow:
 
         grid = QGridLayout()
         additional_rows = 0
-        for i, section in enumerate(section_container.sections):
+        for i, section in enumerate(self.section_container.sections):
             if section.type == SectionType.NAME and i > 0:
                 empty_row = QLabel()
                 grid.addWidget(empty_row, i + additional_rows, 2)
@@ -107,13 +107,13 @@ class PluginWindow:
         """
         label_name = ''
         if section.type == SectionType.PRONUNCIATION:
-            label_name = 'IPA:'
+            label_name = ''
         if section.type == SectionType.DEFINITION:
-            label_name = 'definition:'
+            label_name = ''
         if section.type == SectionType.SENTENCE:
             label_name = ''
         if section.type == SectionType.NAME:
-            label_name = 'word:'
+            label_name = '{}:'.format(section.source)
         if label_name:
             label = QLabel()
             label.setText(label_name)

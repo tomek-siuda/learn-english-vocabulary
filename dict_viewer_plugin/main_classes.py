@@ -26,6 +26,7 @@ class Definition:
 class Word:
     def __init__(self):
         self.word = ''
+        self.source = ''
         self.pos = ''
         self.ipas = []
         self.definitions = []  # type: list[Definition]
@@ -75,6 +76,7 @@ class Section:
         self.audio = None  # type: cache.File
         self.copy_text = False
         self.copy_audio = False
+        self.source = ''
 
     def __unicode__(self):
         result = u''
@@ -144,11 +146,15 @@ def words_to_section_container(words):
     """
     container = SectionContainer()
     for word in words:
-        container.sections.append(word_and_pos_to_section(word.word, word.pos))
+        sections = []
+        sections.append(word_and_pos_to_section(word.word, word.pos))
         for ipa in word.ipas:
-            container.sections.append(ipa_to_section(ipa))
+            sections.append(ipa_to_section(ipa))
         for definition in word.definitions:
-            container.sections.extend(definition_to_sections(definition))
+            sections.extend(definition_to_sections(definition))
+        for section in sections:
+            section.source = word.source
+        container.sections.extend(sections)
     return container
 
 
