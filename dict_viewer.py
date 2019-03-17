@@ -99,6 +99,12 @@ class PluginWindow:
             content_layout.addLayout(self.create_url_layout(key, name))
 
         content_layout.addLayout(self.create_url_layout(
+            'https://dictionary.cambridge.org/dictionary/english/{}'.format(text), 'Cambridge Dictionary'
+        ))
+        content_layout.addLayout(self.create_url_layout(
+            'https://www.dictionary.com/browse/{}?s=t'.format(text), 'Dictionary.com'
+        ))
+        content_layout.addLayout(self.create_url_layout(
             'https://www.google.com/search?tbm=isch&q={}'.format(text), 'Google Images'
         ))
         content_layout.addWidget(QLabel(''))
