@@ -19,9 +19,9 @@ def load_word(word_str):
         raise WordNotFoundError('')
 
     def comparator(a, b):
-        if a == 'UNDEFINED':
+        if a == '':
             return 1
-        if b == 'UNDEFINED':
+        if b == '':
             return -1
         if a < b:
             return -1

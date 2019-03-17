@@ -112,7 +112,7 @@ def parse_html(html):
         try:
             word_object.pos = parsing_tools.find_single_class(word_head, pos_class).string.strip()
         except ParseError:
-            word_object.pos = 'UNDEFINED'
+            word_object.pos = ''
         try:
             word_object.pos_additional = parsing_tools\
                 .find_single_class(word_head, pos_additional_class).text.strip()

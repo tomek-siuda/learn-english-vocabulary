@@ -126,7 +126,7 @@ class PluginWindow:
         for word in words:
             if word.url not in d:
                 d[word.url] = []
-            if word.pos not in d[word.url] and word.pos is not 'UNDEFINED':
+            if word.pos not in d[word.url] and word.pos is not '':
                 d[word.url].append(word.pos)
         return d
 
