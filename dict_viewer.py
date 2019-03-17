@@ -54,6 +54,8 @@ class PluginWindow:
             lambda path: mw.col.media.addFile(path)
         )
         self.editor.web.eval("setFormat('inserthtml', %s);" % json.dumps(text))
+        if self.win:
+            self.win.hide()
 
     def clicked(self, text):
         try:
@@ -174,6 +176,7 @@ class PluginWindow:
 
     def testFunction(self):
         mw.myWidget = win = QWidget()
+        self.win = win
 
         self.main_grid = QVBoxLayout()
 
