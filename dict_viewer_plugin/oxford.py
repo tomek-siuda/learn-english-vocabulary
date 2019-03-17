@@ -8,26 +8,31 @@ from dict_viewer_plugin import cache
 from main_classes import ParseError, Word, Ipa, WordNotFoundError, Definition, Sentence
 
 
-def load_word(word):
+def download(url):
+    try:
+        response = urllib2.urlopen(url)
+    except urllib2.HTTPError, e:
+        if e.code == 404:
+            raise WordNotFoundError('')
+        raise e
+    return response.read()
+
+
+def load_word(word_str):
     main_url = 'https://www.oxfordlearnersdictionaries.com/definition/english/'
-
-    def download(url):
-        try:
-            response = urllib2.urlopen(url)
-        except urllib2.HTTPError, e:
-            if e.code == 404:
-                raise WordNotFoundError('', word)
-            raise e
-        return response.read()
-
-    html = download(main_url + word)
-    words = [parse_html(html)]
+    html = download(main_url + word_str)
+    word = parse_html(html)
+    word.url = main_url + word_str
+    words = [word]
     for i in range(2, 10):
+        url = main_url + word_str + '_' + str(i)
         try:
-            html = download(main_url + word + '_' + str(i))
+            html = download(main_url + word_str + '_' + str(i))
         except WordNotFoundError:
             break
-        words.append(parse_html(html))
+        w = parse_html(html)
+        w.url = url
+        words.append(w)
     return words
 
 

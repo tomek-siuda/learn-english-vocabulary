@@ -29,7 +29,10 @@ def load_word(word):
         if e.code == 404:
             raise WordNotFoundError('', word)
     html = response.read()
-    return parse_html(html)
+    words = parse_html(html)
+    for word in words:
+        word.url = url
+    return words
 
 
 def valid(soup):

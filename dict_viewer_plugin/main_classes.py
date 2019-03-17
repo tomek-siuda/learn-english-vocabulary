@@ -27,6 +27,7 @@ class Word:
     def __init__(self):
         self.word = ''
         self.source = ''
+        self.url = ''
         self.pos = ''
         self.ipas = []
         self.definitions = []  # type: list[Definition]

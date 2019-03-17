@@ -88,6 +88,21 @@ class PluginWindow:
         content_layout.addWidget(self.create_frequency_widget())
         content_layout.addWidget(QLabel(''))
 
+        url_dict = self.create_url_dict(words)
+        for key in sorted(url_dict.keys(), reverse=True):
+            pos_list = ', '.join(url_dict[key])
+            name = ''
+            if 'oxford' in key:
+                name = "Oxford Learner's Dictionaries ({})".format(pos_list)
+            if 'ldoceonline' in key:
+                name = "Longman ({})".format(pos_list)
+            content_layout.addLayout(self.create_url_layout(key, name))
+
+        content_layout.addLayout(self.create_url_layout(
+            'https://www.google.com/search?tbm=isch&q={}'.format(text), 'Google Images'
+        ))
+        content_layout.addWidget(QLabel(''))
+
         grid = QGridLayout()
         additional_rows = 0
         for i, section in enumerate(self.section_container.sections):
@@ -99,6 +114,24 @@ class PluginWindow:
         grid.setColumnStretch(10, 1)
         content_layout.addLayout(grid)
         content_layout.addStretch()
+
+    def create_url_dict(self, words):
+        d = {}
+        for word in words:
+            if word.url not in d:
+                d[word.url] = []
+            if word.pos not in d[word.url] and word.pos is not 'UNDEFINED':
+                d[word.url].append(word.pos)
+        return d
+
+    def create_url_layout(self, url, description):
+        hBox = QHBoxLayout()
+        lab = QLabel()
+        lab.setOpenExternalLinks(True)
+        lab.setText('<a href="{}" style="color: black">{}</a>'.format(url, description))
+        lab.setStyleSheet("font-size: 16px;")
+        hBox.addWidget(lab)
+        return hBox
 
     def create_frequency_widget(self):
         return QLabel('Frequency position: ' + str(self.frequency_position))
