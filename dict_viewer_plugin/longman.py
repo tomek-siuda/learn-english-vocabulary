@@ -102,6 +102,8 @@ def parse_html(html):
         word_head = parsing_tools.find_single_class(word, word_head_class)
         word_object = Word()
         word_object.source = 'Longman'
+        if word.find(class_='bussdictEntry'):
+            word_object.source = 'Longman Business'
         word_object.word = parsing_tools.find_single_class(word_head, name_class).string.replace(u'‧', u'')
         try:
             word_object.pos = parsing_tools.find_single_class(word_head, pos_class).string.strip()
