@@ -59,6 +59,7 @@ def parse_html(html):
     idioms_parent = 'idm-gs'
     definition_parent_class = 'sn-g'
     definition_class = 'def'
+    definition_additional_class = 'gram-g'
     sentence_class = 'x'
     soup = parsing_tools.html_to_soup(html)
 
@@ -105,6 +106,11 @@ def parse_html(html):
         definition_header = parsing_tools.find_single_class(
             def_parent, definition_class)
         definition.definition = definition_header.text
+        try:
+            definition.definition_additional = parsing_tools.find_single_class(
+                def_parent, definition_additional_class)
+        except ParseError:
+            definition.definition_additional = ''
 
         sentences = def_parent.find_all(class_=sentence_class)
         for s in sentences:
