@@ -137,7 +137,7 @@ def definition_to_sections(definition):
 
     definition_section = Section()
     definition_section.type = SectionType.DEFINITION
-    definition_section.elements.append(Element(u'{}'.format(definition.definition), Style.ITALIC))
+    definition_section.elements.append(Element(u'{}'.format(definition.definition)))
     sections.append(definition_section)
 
     for sentence in definition.sentences:
@@ -174,13 +174,27 @@ def section_container_to_text(section_container, file_saver):
     :type section_container: SectionContainer
     """
     result = u''
-    for section in section_container.sections:
-        if section.copy_text or section.copy_audio:
+    sections = [s for s in section_container.sections if s.copy_text or s.copy_audio]
+    for i, section in enumerate(sections):
+        if section.type == SectionType.DEFINITION:
+            result += u"<i>{}</i>".format(unicode(section))
+        else:
             result += unicode(section)
+
         if section.copy_audio:
             fname = file_saver(unicode(section.audio.get_absolute_path()))
             result += ' [sound:%s]' % fname
-        if section.copy_text or section.copy_audio:
-            result += '</br></br>'
+
+        if i == len(sections) - 1:
+            continue
+        if section.type == SectionType.DEFINITION_TYPE \
+                and sections[i+1].type == SectionType.DEFINITION:
+            result += '</br>'
+            continue
+        if sections[i+1].type == SectionType.DEFINITION \
+                and section.type != SectionType.DEFINITION:
+            result += '</br></br></br>'
+            continue
+        result += '</br></br>'
 
     return result
