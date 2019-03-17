@@ -58,11 +58,7 @@ class PluginWindow:
     def clicked(self, text):
         try:
             section_container = load_word(text)
-        except ParseError, e:
-            showWarning('Parsing error: {}'.format(e.message))
-            return
         except WordNotFoundError, e:
-            showWarning('Word not found: {}'.format(e.word))
             return
 
         self.frequency_position = frequency_list.get_position(text)
