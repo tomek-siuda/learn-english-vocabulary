@@ -17,7 +17,18 @@ def load_word(word_str):
     words.extend(load_from_dict(longman, word_str, 'Longman'))
     if len(words) == 0:
         raise WordNotFoundError('')
-    words.sort(key=lambda w: w.pos)
+
+    def comparator(a, b):
+        if a == 'UNDEFINED':
+            return 1
+        if b == 'UNDEFINED':
+            return -1
+        if a < b:
+            return -1
+        else:
+            return 1
+
+    words.sort(key=lambda w: w.pos, cmp=comparator)
     return words
 
 
