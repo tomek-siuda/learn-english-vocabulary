@@ -184,7 +184,7 @@ def section_container_to_text(section_container, file_saver, word_to_bold):
     for i, section in enumerate(sections):
         if section.type == SectionType.DEFINITION:
             result += u"<i>{}</i>".format(unicode(section))
-        if section.type == SectionType.SENTENCE:
+        elif section.type == SectionType.SENTENCE:
             result += add_bold_tags(
                 unicode(section),
                 [
