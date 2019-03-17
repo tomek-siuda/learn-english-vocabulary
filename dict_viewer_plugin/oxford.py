@@ -90,7 +90,9 @@ def parse_html(html):
         word.ipas.append(ipa)
 
     # remove idiom div, it also has definitions we don't need
-    parsing_tools.find_single_class(soup, idioms_parent).decompose()
+    idiom_div = soup.find(class_=idioms_parent)
+    if idiom_div:
+        idiom_div.decompose()
     definitions = parsing_tools.find_all_classes(soup, definition_parent_class)
     for def_parent in definitions:
         definition = Definition()
