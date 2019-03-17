@@ -195,7 +195,7 @@ class PluginWindow:
         if section.type == SectionType.PRONUNCIATION:
             content_style += "font-size: 12px;"
         if section.type == SectionType.DEFINITION_TYPE:
-            content_style += "font-size: 12px; background-color: transparent;"
+            content_style += "font-size: 12px; background-color: transparent; color: grey"
 
         content = QLabel()
         content.setFixedWidth(900)
