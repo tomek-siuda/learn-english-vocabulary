@@ -121,8 +121,13 @@ def parse_html(html):
     definitions = parsing_tools.find_all_classes(soup, definition_parent_class)
     for def_parent in definitions:
         definition = Definition()
-        definition_header = parsing_tools.find_single_class(
-            def_parent, definition_class)
+        try:
+            definition_header = parsing_tools.find_single_class(
+                def_parent, definition_class)
+        except ClassNotFound:
+            # Probably a link to some other page
+            continue
+
         definition.definition = definition_header.text
         try:
             definition.definition_additional = parsing_tools.find_single_class(
