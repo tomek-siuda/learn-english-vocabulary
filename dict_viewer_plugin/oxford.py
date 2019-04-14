@@ -22,16 +22,16 @@ def download(url):
 def load_word(word_str):
     main_url = 'https://www.oxfordlearnersdictionaries.com/definition/english/'
     html = download(main_url + word_str)
-    word = parse_html(html)
+    word = try_to_parse_html(html, main_url + word_str)
     word.url = main_url + word_str
     words = [word]
     for i in range(2, 10):
         url = main_url + word_str + '_' + str(i)
         try:
-            html = download(main_url + word_str + '_' + str(i))
+            html = download(url)
         except WordNotFoundError:
             break
-        w = parse_html(html)
+        w = try_to_parse_html(html, url)
         w.url = url
         words.append(w)
     return words
@@ -46,6 +46,15 @@ def extract_ipa(content):
     if len(split[2]) == 0:
         raise ParseError(u'IPA is empty.')
     return content.split(u'/')[2]
+
+
+def try_to_parse_html(html, url):
+    try:
+        w = parse_html(html)
+    except (ParseError, TooManyClasses, ClassNotFound), e:
+        e.message += '\nUrl: {}'.format(url)
+        raise e
+    return w
 
 
 def parse_html(html):
