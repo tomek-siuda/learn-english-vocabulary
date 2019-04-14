@@ -68,13 +68,21 @@ def parse_html(html):
     word = Word()
     word.source = 'Oxford'
     word.word = parsing_tools.find_single_class(header, name_class).string
-    word.pos = parsing_tools.find_single_class(header, pos_class).string
+    try:
+        word.pos = parsing_tools.find_single_class(header, pos_class).string
+    except ClassNotFound:
+        word.pos = 'undefined'
 
     prons = parsing_tools.find_all_classes(soup, pron_top_class)
     for pron in prons:
         ipa = Ipa()
-        ipa_content = parsing_tools.find_single_class(pron, ipa_class)
-        ipa.ipa = extract_ipa(ipa_content.text)
+        try:
+            ipa_content = parsing_tools.find_single_class(pron, ipa_class)
+        except ClassNotFound:
+            pass
+        else:
+            ipa.ipa = extract_ipa(ipa_content.text)
+
         audio_div = parsing_tools.find_single_class(pron, audio_class)
         audio_url = audio_div[audio_url_param_name]
         ipa.audio = cache.File(audio_url, 'mp3')
