@@ -60,6 +60,10 @@ class PluginWindow:
             self.win.hide()
 
     def clicked(self, text):
+        """
+        :type text: str
+        """
+        text = text.strip().lower()
         try:
             words = load_word(text)
         except WordNotFoundError, e:
