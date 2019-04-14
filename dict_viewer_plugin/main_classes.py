@@ -40,6 +40,14 @@ class ParseError(Exception):
     pass
 
 
+class ClassNotFound(Exception):
+    pass
+
+
+class TooManyClasses(Exception):
+    pass
+
+
 class WordNotFoundError(Exception):
     def __init__(self, message, word=''):
         super(Exception, self).__init__(message)

@@ -5,7 +5,8 @@ import urllib2
 import parsing_tools
 from dict_viewer_plugin import cache
 
-from main_classes import ParseError, Word, Ipa, WordNotFoundError, Definition, Sentence
+from main_classes import ParseError, ClassNotFound, TooManyClasses, \
+    Word, Ipa, WordNotFoundError, Definition, Sentence
 
 
 def download(url):
@@ -109,7 +110,7 @@ def parse_html(html):
         try:
             definition.definition_additional = parsing_tools.find_single_class(
                 def_parent, definition_additional_class)
-        except ParseError:
+        except ClassNotFound:
             definition.definition_additional = ''
 
         sentences = def_parent.find_all(class_=sentence_class)

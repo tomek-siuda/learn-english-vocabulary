@@ -1,6 +1,6 @@
 from bs4 import BeautifulSoup
 
-from main_classes import ParseError
+from main_classes import ParseError, ClassNotFound, TooManyClasses
 
 
 def html_to_soup(html):
@@ -13,9 +13,9 @@ def html_to_soup(html):
 def find_all_classes(soup, class_name, expected_length=0):
     result = soup.find_all(class_=class_name)
     if len(result) == 0:
-        raise ParseError("Can't find a class '{}'".format(class_name))
+        raise ClassNotFound("Can't find a class '{}'".format(class_name))
     if expected_length > 0 and len(result) != expected_length:
-        raise ParseError("Too many classes '{}'".format(class_name))
+        raise TooManyClasses("Too many classes '{}'".format(class_name))
     return result
 
 

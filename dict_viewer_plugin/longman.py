@@ -5,7 +5,8 @@ import urllib2
 import parsing_tools
 import cache
 
-from main_classes import ParseError, Word, Ipa, WordNotFoundError, Definition, Sentence
+from main_classes import ParseError, ClassNotFound, TooManyClasses, \
+    Word, Ipa, WordNotFoundError, Definition, Sentence
 
 
 word_section_class = 'dictentry'
@@ -62,11 +63,11 @@ def extract_ipa(word_soup, region):
     ipa.region = region
     try:
         ipa.ipa = parsing_tools.find_single_class(word_soup, ipa_class).text.strip().replace(u'/', '')
-    except ParseError:
+    except ClassNotFound:
         ipa.ipa = ''
     try:
         audio_div = parsing_tools.find_single_class(word_soup, audio_class)
-    except ParseError:
+    except ClassNotFound:
         return ipa
     audio_url = audio_div[audio_url_param_name]
     ipa.audio = cache.File(audio_url, 'mp3')
@@ -78,13 +79,13 @@ def extract_definition(def_parent, word_object):
     try:
         definition.definition = parsing_tools.find_single_class(
             def_parent, definition_class).text
-    except ParseError:
+    except ClassNotFound:
         # Can't find the definition, it's probably just a link to another page
         return
     try:
         definition.definition_additional = parsing_tools.find_single_class(
             def_parent, definition_additional_class).text
-    except ParseError:
+    except ClassNotFound:
         definition.definition_additional = ''
 
     sentences = def_parent.find_all(class_=sentence_class)
@@ -117,12 +118,12 @@ def parse_html(html):
         word_object.word = parsing_tools.find_single_class(word_head, name_class).string.replace(u'‧', u'')
         try:
             word_object.pos = parsing_tools.find_single_class(word_head, pos_class).string.strip()
-        except ParseError:
+        except ClassNotFound:
             word_object.pos = ''
         try:
             word_object.pos_additional = parsing_tools\
                 .find_single_class(word_head, pos_additional_class).text.strip()
-        except ParseError:
+        except ClassNotFound:
             word_object.pos_additional = ''
 
         word_object.ipas.append(extract_ipa(word_head, 'br'))

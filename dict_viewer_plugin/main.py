@@ -1,7 +1,7 @@
 import oxford
 import main_classes
 import longman
-from main_classes import ParseError, WordNotFoundError, Word
+from main_classes import ParseError, ClassNotFound, TooManyClasses, WordNotFoundError, Word
 from aqt.utils import showInfo, showWarning
 
 
@@ -36,7 +36,7 @@ def load_from_dict(module, word, module_name):
     words = []
     try:
         words.extend(module.load_word(word))
-    except ParseError, e:
+    except (ParseError, ClassNotFound, TooManyClasses), e:
         showWarning('{} parsing error: {}'.format(module_name, e.message))
     except WordNotFoundError, e:
         showWarning('{} word not found'.format(module_name, e.message))
