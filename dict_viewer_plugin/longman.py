@@ -129,14 +129,18 @@ def parse_html(html):
         word_object.ipas.append(extract_ipa(word_head, 'br'))
         word_object.ipas.append(extract_ipa(word_head, 'us'))
 
-        definitions = parsing_tools.find_all_classes(word, definition_parent_class)
-        for def_parent in definitions:
-            subdefinitions = def_parent.find_all(class_=subdefinition_parent_class)
-            if subdefinitions:
-                for subdef in subdefinitions:
-                    extract_definition(subdef, word_object)
-            else:
-                extract_definition(def_parent, word_object)
+        try:
+            definitions = parsing_tools.find_all_classes(word, definition_parent_class)
+        except ClassNotFound:
+            pass
+        else:
+            for def_parent in definitions:
+                subdefinitions = def_parent.find_all(class_=subdefinition_parent_class)
+                if subdefinitions:
+                    for subdef in subdefinitions:
+                        extract_definition(subdef, word_object)
+                else:
+                    extract_definition(def_parent, word_object)
 
         word_objects.append(word_object)
 
