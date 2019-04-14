@@ -70,6 +70,7 @@ def parse_html(html):
     definition_parent_class = 'sn-g'
     definition_class = 'def'
     definition_additional_class = 'gram-g'
+    definition_label_class = 'label-g'  # "informal", "especially north american", etc
     sentence_class = 'x'
     soup = parsing_tools.html_to_soup(html)
 
@@ -131,8 +132,13 @@ def parse_html(html):
             except ClassNotFound:
                 # Probably a link to some other page
                 continue
-
             definition.definition = definition_header.text
+
+            label = def_parent.find(class_=definition_label_class)
+            if label:
+                definition.definition = label.text.replace('(', '[').replace(')', ']') \
+                                        + ' ' + definition.definition
+
             try:
                 definition.definition_additional = parsing_tools.find_single_class(
                     def_parent, definition_additional_class)
