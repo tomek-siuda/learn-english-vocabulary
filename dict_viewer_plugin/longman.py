@@ -131,10 +131,12 @@ def parse_html(html):
 
         definitions = parsing_tools.find_all_classes(word, definition_parent_class)
         for def_parent in definitions:
-            extract_definition(def_parent, word_object)
             subdefinitions = def_parent.find_all(class_=subdefinition_parent_class)
-            for subdef in subdefinitions:
-                extract_definition(subdef, word_object)
+            if subdefinitions:
+                for subdef in subdefinitions:
+                    extract_definition(subdef, word_object)
+            else:
+                extract_definition(def_parent, word_object)
 
         word_objects.append(word_object)
 
