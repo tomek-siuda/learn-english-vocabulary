@@ -118,29 +118,33 @@ def parse_html(html):
     idiom_div = soup.find(class_=idioms_parent)
     if idiom_div:
         idiom_div.decompose()
-    definitions = parsing_tools.find_all_classes(soup, definition_parent_class)
-    for def_parent in definitions:
-        definition = Definition()
-        try:
-            definition_header = parsing_tools.find_single_class(
-                def_parent, definition_class)
-        except ClassNotFound:
-            # Probably a link to some other page
-            continue
+    try:
+        definitions = parsing_tools.find_all_classes(soup, definition_parent_class)
+    except ClassNotFound:
+        pass
+    else:
+        for def_parent in definitions:
+            definition = Definition()
+            try:
+                definition_header = parsing_tools.find_single_class(
+                    def_parent, definition_class)
+            except ClassNotFound:
+                # Probably a link to some other page
+                continue
 
-        definition.definition = definition_header.text
-        try:
-            definition.definition_additional = parsing_tools.find_single_class(
-                def_parent, definition_additional_class)
-        except ClassNotFound:
-            definition.definition_additional = ''
+            definition.definition = definition_header.text
+            try:
+                definition.definition_additional = parsing_tools.find_single_class(
+                    def_parent, definition_additional_class)
+            except ClassNotFound:
+                definition.definition_additional = ''
 
-        sentences = def_parent.find_all(class_=sentence_class)
-        for s in sentences:
-            sentence = Sentence()
-            sentence.content = s.text
-            definition.sentences.append(sentence)
+            sentences = def_parent.find_all(class_=sentence_class)
+            for s in sentences:
+                sentence = Sentence()
+                sentence.content = s.text
+                definition.sentences.append(sentence)
 
-        word.definitions.append(definition)
+            word.definitions.append(definition)
 
     return word
