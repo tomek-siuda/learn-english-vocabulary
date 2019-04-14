@@ -18,6 +18,8 @@ definition_parent_class = 'Sense'
 subdefinition_parent_class = 'Subsense'
 definition_class = 'DEF'
 definition_additional_class = 'GRAM'
+definition_geo_class = 'GEO'
+definition_register_class = 'REGISTERLAB'
 sentence_class = 'EXAMPLE'
 sentence_audio_class = 'exafile'
 audio_url_param_name = 'data-src-mp3'
@@ -82,6 +84,12 @@ def extract_definition(def_parent, word_object):
     except ClassNotFound:
         # Can't find the definition, it's probably just a link to another page
         return
+    geo = def_parent.find(class_=definition_geo_class)
+    if geo:
+        definition.definition = '[{}] '.format(geo.text) + definition.definition
+    register = def_parent.find(class_=definition_register_class)
+    if register:
+        definition.definition = '[{}] '.format(register.text) + definition.definition
     try:
         definition.definition_additional = parsing_tools.find_single_class(
             def_parent, definition_additional_class).text
