@@ -20,6 +20,7 @@ def download(url):
 
 
 def load_word(word_str):
+    word_str = '-'.join(word_str.split())
     main_url = 'https://www.oxfordlearnersdictionaries.com/definition/english/'
     html = download(main_url + word_str)
     word = try_to_parse_html(html, main_url + word_str)

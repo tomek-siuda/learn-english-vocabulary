@@ -26,6 +26,7 @@ audio_url_param_name = 'data-src-mp3'
 
 
 def load_word(word):
+    word = '-'.join(word.split())
     url = 'https://www.ldoceonline.com/dictionary/'
     url += word
     try:
