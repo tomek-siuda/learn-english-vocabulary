@@ -23,6 +23,7 @@ definition_register_class = 'REGISTERLAB'
 sentence_class = 'EXAMPLE'
 sentence_audio_class = 'exafile'
 audio_url_param_name = 'data-src-mp3'
+crossref_class = 'Crossref'
 
 
 def load_word(word):
@@ -151,6 +152,10 @@ def parse_html(html):
             pass
         else:
             for def_parent in definitions:
+                cross_refs = soup.find_all(class_=crossref_class)
+                for cr in cross_refs:
+                    cr.decompose()
+
                 subdefinitions = def_parent.find_all(class_=subdefinition_parent_class)
                 if subdefinitions:
                     for subdef in subdefinitions:
