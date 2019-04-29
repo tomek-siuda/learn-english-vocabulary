@@ -73,6 +73,8 @@ def parse_html(html):
     definition_additional_class = 'gram-g'
     definition_label_class = 'label-g'  # "informal", "especially north american", etc
     sentence_class = 'x'
+    synonyms_title = 'Synonyms'
+    collocations_title = 'Collocations'
     soup = parsing_tools.html_to_soup(html)
 
     header = parsing_tools.find_single_class(soup, word_header_class)
@@ -134,6 +136,14 @@ def parse_html(html):
                 # Probably a link to some other page
                 continue
             definition.definition = definition_header.text
+
+            # synonyms can have labels we don't need
+            synonyms = soup.find(title=synonyms_title)
+            if synonyms:
+                synonyms.decompose()
+            collocations = soup.find(title=collocations_title)
+            if collocations:
+                collocations.decompose()
 
             label = def_parent.find(class_=definition_label_class)
             if label:
