@@ -55,7 +55,14 @@ def extract_ipa(word_soup, region):
     ipa_class = 'PronCodes'
     br_ipa_audio_class = 'brefile'
     us_ipa_audio_class = 'amefile'
+    inflections_class = 'Inflections'
     audio_url_param_name = 'data-src-mp3'
+
+    # remove inflections (say -> said, says)
+    # they contain only IPA without any audio
+    inflections = word_soup.find(class_=inflections_class)
+    if inflections:
+        inflections.decompose()
 
     if region == 'br':
         audio_class = br_ipa_audio_class
