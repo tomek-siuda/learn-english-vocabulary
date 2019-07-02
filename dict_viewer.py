@@ -1,28 +1,21 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# import the main window object (mw) from aqt
 import json
-
 from aqt import mw
-# import the "show info" tool from utils.py
 from aqt.utils import showInfo, showWarning
-# import all of the Qt GUI library
 from aqt.qt import *
 import anki
 from aqt.editor import Editor
 from anki.hooks import wrap
-
 import sys
 import traceback
-
 from dict_viewer_plugin import cache, main_classes, frequency_list
 from dict_viewer_plugin.main_classes import ParseError, WordNotFoundError, Element, Section, \
     SectionType, SectionContainer, Word
+from dict_viewer_plugin.main import load_word
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "dict_viewer_plugin", "site_packages"))
-
-from dict_viewer_plugin.main import load_word
 
 
 def play_sound(sound_file):
@@ -171,7 +164,6 @@ class PluginWindow:
         if label_name:
             label = QLabel()
             label.setText(label_name)
-            # label.setStyleSheet("border: 1px solid black")
             label.setSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
             grid.addWidget(label, row_id, 1)
         if section.audio is not None:
@@ -229,12 +221,10 @@ class PluginWindow:
         """
         section.copy_text = cb.isChecked()
 
-    def testFunction(self):
+    def run(self):
         mw.myWidget = win = QWidget()
         self.win = win
-
         self.main_grid = QVBoxLayout()
-
         typingGrid = QHBoxLayout()
 
         word_line = QLineEdit()
@@ -248,7 +238,6 @@ class PluginWindow:
         typingGrid.addWidget(button)
 
         typingGrid.addStretch()
-
 
         self.main_grid.addLayout(typingGrid)
         self.main_grid.addWidget(QLabel(''))
@@ -266,14 +255,11 @@ class PluginWindow:
 
         self.main_grid.addWidget(scroll)
 
-
         self.main_grid.addWidget(QLabel(''))
         copy_button = QPushButton()
         copy_button.setText('copy')
         copy_button.setSizePolicy ( QSizePolicy.Fixed, QSizePolicy.Fixed)
         self.main_grid.addWidget(copy_button)
-
-        # self.main_grid.addStretch()
 
         button.clicked.connect(lambda: self.clicked(word_line.text()))
         word_line.returnPressed.connect(lambda: self.clicked(word_line.text()))
@@ -286,20 +272,20 @@ class PluginWindow:
 
 plugin_window = PluginWindow(None)
 
-# create a new menu item, "test"
-action = QAction("test", mw)
-# set it to call testFunction when it's clicked
-action.triggered.connect(plugin_window.testFunction)
-# and add it to the tools menu
+action = QAction("dict viewer", mw)
+action.triggered.connect(plugin_window.run)
 mw.form.menuTools.addAction(action)
+
 
 def open_plugin_window(self):
     plugin_window = PluginWindow(self)
-    plugin_window.testFunction()
+    plugin_window.run()
+
 
 def setup_buttons(self):
     self._addButton("mybutton", lambda s=self: open_plugin_window(self),
                     text=u"D", tip="dict viewer", key="")
+
 
 Editor.open_plugin_window = open_plugin_window
 Editor.setupButtons = wrap(Editor.setupButtons, setup_buttons)
