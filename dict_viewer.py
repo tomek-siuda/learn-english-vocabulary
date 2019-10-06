@@ -1,6 +1,12 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+import sys
+import os
+
+sys.path.append(os.path.join(os.path.dirname(__file__), "dict_viewer_plugin", "site_packages"))
+
+import traceback
 import json
 from aqt import mw
 from aqt.utils import showInfo, showWarning
@@ -8,14 +14,10 @@ from aqt.qt import *
 import anki
 from aqt.editor import Editor
 from anki.hooks import wrap
-import sys
-import traceback
 from dict_viewer_plugin import cache, main_classes, frequency_list
 from dict_viewer_plugin.main_classes import ParseError, WordNotFoundError, Element, Section, \
     SectionType, SectionContainer, Word
 from dict_viewer_plugin.main import load_word
-
-sys.path.append(os.path.join(os.path.dirname(__file__), "dict_viewer_plugin", "site_packages"))
 
 
 def play_sound(sound_file):
