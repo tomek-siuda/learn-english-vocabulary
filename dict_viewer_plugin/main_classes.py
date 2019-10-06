@@ -2,6 +2,7 @@ import os
 import re
 
 from dict_viewer_plugin import cache
+from dict_viewer_plugin.utils import create_variations
 
 
 class Ipa:
@@ -195,14 +196,7 @@ def section_container_to_text(section_container, file_saver, word_to_bold):
         elif section.type == SectionType.SENTENCE:
             result += add_bold_tags(
                 unicode(section),
-                [
-                    word_to_bold,
-                    word_to_bold + 's',
-                    word_to_bold+'ing',
-                    word_to_bold[:-1] + 'ing',
-                    word_to_bold+'ed',
-                    word_to_bold+'d'
-                ]
+                create_variations(word_to_bold)
             )
         else:
             result += unicode(section)
