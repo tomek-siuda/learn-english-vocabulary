@@ -89,6 +89,7 @@ class PluginWindow:
                         widget.setParent(None)
 
         content_layout.addWidget(self.create_frequency_widget(text))
+        content_layout.addWidget(self.create_frequency_widget(text, True))
         content_layout.addWidget(QLabel(''))
 
         url_dict = self.create_url_dict(words)
@@ -146,11 +147,11 @@ class PluginWindow:
         hBox.addWidget(lab)
         return hBox
 
-    def create_frequency_widget(self, text):
+    def create_frequency_widget(self, text, lemmatized=False):
         def sort_getter(element):
             return element[1]
         variations = create_variations(text)
-        positions = [(variation, frequency_list.get_position(variation)) for variation in variations]
+        positions = [(variation, frequency_list.get_position(variation, lemmatized)) for variation in variations]
         positions.sort(key=sort_getter)
         msgs = []
         for position in positions:
@@ -160,6 +161,8 @@ class PluginWindow:
             if position[1] < 0:
                 continue
             msgs.append('{}: {}'.format(position[0], position[1]))
+        if lemmatized:
+            return QLabel('Frequency position (lemmatized): ' + ', '.join(msgs))
         return QLabel('Frequency position: ' + ', '.join(msgs))
 
     def section_to_widget(self, section, grid, row_id):
