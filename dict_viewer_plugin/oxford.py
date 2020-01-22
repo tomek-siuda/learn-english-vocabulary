@@ -39,15 +39,7 @@ def load_word(word_str):
 
 
 def extract_ipa(content):
-    # IPA content example: 'NAmE//rɪˈmɑːrkəbl//'
-    split = content.split(u'/')
-    if len(split) != 5:
-        raise ParseError(u'IPA content format has changed. Length after split should be equal to 5.\n'
-                         u'Content: ' + content)
-    if len(split[2]) == 0:
-        raise ParseError(u'IPA is empty.')
-    return content.split(u'/')[2]
-
+    return content.split(u'/')[1]
 
 def try_to_parse_html(html, url):
     try:
@@ -59,16 +51,17 @@ def try_to_parse_html(html, url):
 
 
 def parse_html(html):
-    word_header_class = 'webtop-g'
-    name_class = 'h'
+    top_container_class = 'top-g'
+    name_class = 'headword'
     pos_class = 'pos'
-    pron_section_class = 'vp-g'
-    pron_top_class = 'pron-g'
+    verb_form_root_class = 'verb_form'
+    verb_form_description_class = 'verb_form'
+    pron_top_class = 'phonetics'
     ipa_class = 'phon'
     audio_class = 'sound'
     audio_url_param_name = 'data-src-mp3'
-    idioms_parent = 'idm-gs'
-    definition_parent_class = 'sn-g'
+    idioms_parent = 'idioms'
+    definition_parent_class = 'sense'
     definition_class = 'def'
     definition_additional_class = 'gram-g'
     definition_label_class = 'label-g'  # "informal", "especially north american", etc
@@ -78,50 +71,53 @@ def parse_html(html):
     collocations_title = 'Collocations'
     soup = parsing_tools.html_to_soup(html)
 
-    header = parsing_tools.find_single_class(soup, word_header_class)
+    # there are many class with this name, get the first one
+    top_container = soup.find(class_=top_container_class)
     word = Word()
     word.source = 'Oxford'
-    word.word = parsing_tools.find_single_class(header, name_class).text
+    word.word = parsing_tools.find_single_class(top_container, name_class).text
     try:
-        word.pos = parsing_tools.find_single_class(header, pos_class).string
+        word.pos = parsing_tools.find_single_class(top_container, pos_class).string
     except ClassNotFound:
         word.pos = 'undefined'
 
     try:
-        prons = parsing_tools.find_all_classes(soup, pron_top_class)
+        pron_collections = parsing_tools.find_all_classes(top_container, pron_top_class)
     except ClassNotFound:
         pass
     else:
-        for pron in prons:
-            ipa = Ipa()
-            try:
-                ipa_content = parsing_tools.find_single_class(pron, ipa_class)
-            except ClassNotFound:
-                pass
-            else:
-                ipa.ipa = extract_ipa(ipa_content.text)
+        for pron_collection in pron_collections:
+            prons = pron_collection.find_all('div', recursive=False)
+            for pron in prons:
+                ipa = Ipa()
+                try:
+                    ipa_content = parsing_tools.find_single_class(pron, ipa_class)
+                except ClassNotFound:
+                    pass
+                else:
+                    ipa.ipa = extract_ipa(ipa_content.text)
 
-            audio_div = parsing_tools.find_single_class(pron, audio_class)
-            audio_url = audio_div[audio_url_param_name]
-            ipa.audio = cache.File(audio_url, 'mp3')
-            try:
-                geo = pron['geo']
-            except KeyError:
-                raise ParseError("Can't find 'geo' attribute in a pronunciation class {}".format(str(pron)))
-            if 'br' in geo and 'am' in geo:
-                raise ParseError("Can't decide if IPA is UK or US, geo name: '{}'".format(geo))
-            if 'br' in geo:
-                ipa.region = 'BR'
-            elif 'am' in geo:
-                ipa.region = 'US'
-            else:
-                raise ParseError("Can't decide if IPA is UK or US, geo name: '{}'".format(geo))
-            pron_section = pron.find_parent(class_=pron_section_class)
-            if pron_section:
-                description_words = pron_section.find(class_='vp').text.split(' ')
-                description_words[-1] = '<b>' + description_words[-1] + '</b>'
-                ipa.description = ' '.join(description_words)
-            word.ipas.append(ipa)
+                audio_div = parsing_tools.find_single_class(pron, audio_class)
+                audio_url = audio_div[audio_url_param_name]
+                ipa.audio = cache.File(audio_url, 'mp3')
+                try:
+                    geo = pron['geo']
+                except KeyError:
+                    raise ParseError("Can't find 'geo' attribute in a pronunciation class {}".format(str(pron)))
+                if 'br' in geo and 'am' in geo:
+                    raise ParseError("Can't decide if IPA is UK or US, geo name: '{}'".format(geo))
+                if 'br' in geo:
+                    ipa.region = 'BR'
+                elif 'am' in geo:
+                    ipa.region = 'US'
+                else:
+                    raise ParseError("Can't decide if IPA is UK or US, geo name: '{}'".format(geo))
+                pron_section = pron.find_parent(class_=verb_form_root_class)
+                if pron_section:
+                    description_words = pron_section.find(class_=verb_form_description_class).text.split(' ')
+                    description_words[-1] = '<b>' + description_words[-1] + '</b>'
+                    ipa.description = ' '.join(description_words)
+                word.ipas.append(ipa)
 
     # remove idiom div, it also has definitions we don't need
     idiom_div = soup.find(class_=idioms_parent)

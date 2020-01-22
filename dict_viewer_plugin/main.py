@@ -37,7 +37,7 @@ def load_from_dict(module, word, module_name):
     try:
         words.extend(module.load_word(word))
     except (ParseError, ClassNotFound, TooManyClasses), e:
-        showWarning('{} parsing error: {}'.format(module_name, e.message))
+        showWarning(u'{} parsing error: {}'.format(module_name, e.message))
     except WordNotFoundError, e:
-        showWarning('{} word not found'.format(module_name, e.message))
+        showWarning(u'{} word not found'.format(module_name, e.message))
     return words
