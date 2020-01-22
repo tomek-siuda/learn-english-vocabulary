@@ -11,7 +11,7 @@ class TestOxford(unittest.TestCase):
 
     def test_parse_html(self):
         with open("test_data/oxford/dog.html") as f:
-            data = f.read()oxford_test.py
+            data = f.read()oxford_old_test.py
             word = parse_html(data)  # type: Word
             self.assertEqual('dog', word.word)
             self.assertEqual('noun', word.pos)
