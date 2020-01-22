@@ -51,9 +51,10 @@ def try_to_parse_html(html, url):
 
 
 def parse_html(html):
-    top_container_class = 'top-g'
+    top_container_class = 'webtop'
     name_class = 'headword'
     pos_class = 'pos'
+    pos_additional_classes = ['labels', 'inflections', 'variants']
     verb_form_root_class = 'verb_form'
     verb_form_description_class = 'verb_form'
     pron_top_class = 'phonetics'
@@ -63,8 +64,8 @@ def parse_html(html):
     idioms_parent = 'idioms'
     definition_parent_class = 'sense'
     definition_class = 'def'
-    definition_additional_class = 'gram-g'
-    definition_label_class = 'label-g'  # "informal", "especially north american", etc
+    definition_additional_class = 'grammar' # "uncountable", etc
+    definition_label_class = 'labels'  # "informal", "especially north american", etc
     sentence_class = 'x'
     collapse_class = 'collapse'
     synonyms_title = 'Synonyms'
@@ -80,6 +81,14 @@ def parse_html(html):
         word.pos = parsing_tools.find_single_class(top_container, pos_class).string
     except ClassNotFound:
         word.pos = 'undefined'
+
+    pos_additionals = []
+    for c in pos_additional_classes:
+        pos_additional = top_container.find(class_=c, recursive=False)
+        if pos_additional:
+            pos_additionals.append(pos_additional.text.replace('(', '[').replace(')', ']'))
+
+    word.pos_additional = ' '.join(pos_additionals)
 
     try:
         pron_collections = parsing_tools.find_all_classes(top_container, pron_top_class)
@@ -144,13 +153,13 @@ def parse_html(html):
                 c.decompose()
 
             label = def_parent.find(class_=definition_label_class)
-            if label:
+            if label and len(label.text.strip())>0:
                 definition.definition = label.text.replace('(', '[').replace(')', ']') \
                                         + ' ' + definition.definition
 
             try:
                 definition.definition_additional = parsing_tools.find_single_class(
-                    def_parent, definition_additional_class)
+                    def_parent, definition_additional_class).text
             except ClassNotFound:
                 definition.definition_additional = ''
 
