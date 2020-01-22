@@ -89,16 +89,22 @@ def extract_definition(def_parent, word_object):
     definition = Definition()
     try:
         definition.definition = parsing_tools.find_single_class(
-            def_parent, definition_class).text
+            def_parent, definition_class).text.strip()
     except ClassNotFound:
         # Can't find the definition, it's probably just a link to another page
         return
+
+    registers = []
+    register_divs = def_parent.find_all(class_=definition_register_class)
+    for register_div in register_divs:
+        registers.append('[{}]'.format(register_div.text.strip()))
+    if len(registers) > 0:
+        definition.definition = ' '.join(registers) + ' ' + definition.definition
+
     geo = def_parent.find(class_=definition_geo_class)
     if geo:
-        definition.definition = '[{}] '.format(geo.text) + definition.definition
-    register = def_parent.find(class_=definition_register_class)
-    if register:
-        definition.definition = '[{}] '.format(register.text) + definition.definition
+        definition.definition = '[{}] '.format(geo.text.strip()) + definition.definition
+
     try:
         definition.definition_additional = parsing_tools.find_single_class(
             def_parent, definition_additional_class).text
