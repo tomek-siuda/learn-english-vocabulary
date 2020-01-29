@@ -1,7 +1,14 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 from bs4 import BeautifulSoup
-import urllib2
+try:
+    # For Python 3.0 and later
+    from urllib.request import urlopen
+    from urllib.error import HTTPError
+except ImportError:
+    # Fall back to Python 2
+    from urllib2 import urlopen
+    from urllib2 import HTTPError
 import parsing_tools
 import cache
 
@@ -31,8 +38,8 @@ def load_word(word):
     url = 'https://www.ldoceonline.com/dictionary/'
     url += word
     try:
-        response = urllib2.urlopen(url)
-    except urllib2.HTTPError, e:
+        response = urlopen(url)
+    except HTTPError as e:
         if e.code == 404:
             raise WordNotFoundError('', word)
     html = response.read()

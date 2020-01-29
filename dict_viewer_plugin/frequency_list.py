@@ -1,15 +1,18 @@
 import os
+import io
 
 word_dict = {}
 word_dict_lemmatized = {}
 
-with open(os.path.join(os.path.dirname(__file__), "files", "en_50k 2016.txt")) as f:
+with io.open(os.path.join(os.path.dirname(__file__), "files", "en_50k 2016.txt"),
+          encoding="utf8") as f:
     i = 1
     for line in f:
         word_dict[line.split()[0]] = i
         i += 1
 
-with open(os.path.join(os.path.dirname(__file__), "files", "en_50k 2016_lemmatized.txt")) as f:
+with io.open(os.path.join(os.path.dirname(__file__), "files", "en_50k 2016_lemmatized.txt"),
+          encoding="utf8") as f:
     i = 1
     for line in f:
         word_dict_lemmatized[line.strip()] = i

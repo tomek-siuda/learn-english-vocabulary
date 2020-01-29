@@ -1,4 +1,6 @@
-import os
+import sys
+if sys.version_info[0] >= 3:
+    unicode = str
 import re
 
 from dict_viewer_plugin import cache
@@ -81,6 +83,9 @@ class Element:
             return u'<b>{}</b>'.format(self.text)
         if self.style == Style.ITALIC:
             return u'<i>{}</i>'.format(self.text)
+        
+    def __str__(self):
+        return self.__unicode__()
 
 
 class Section:
@@ -97,6 +102,9 @@ class Section:
         for element in self.elements:
             result += unicode(element)
         return result
+
+    def __str__(self):
+        return self.__unicode__()
 
 
 class SectionContainer:

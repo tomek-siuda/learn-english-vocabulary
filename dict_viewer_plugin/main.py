@@ -3,7 +3,7 @@ import main_classes
 import longman
 from main_classes import ParseError, ClassNotFound, TooManyClasses, WordNotFoundError, Word
 from aqt.utils import showInfo, showWarning
-
+from functools import cmp_to_key
 
 def load_word(word_str):
     """
@@ -19,6 +19,8 @@ def load_word(word_str):
         raise WordNotFoundError('')
 
     def comparator(a, b):
+        a = a.pos
+        b = b.pos
         if a == '':
             return 1
         if b == '':
@@ -28,7 +30,7 @@ def load_word(word_str):
         else:
             return 1
 
-    words.sort(key=lambda w: w.pos, cmp=comparator)
+    words.sort(key=cmp_to_key(comparator))
     return words
 
 
@@ -36,8 +38,8 @@ def load_from_dict(module, word, module_name):
     words = []
     try:
         words.extend(module.load_word(word))
-    except (ParseError, ClassNotFound, TooManyClasses), e:
+    except (ParseError, ClassNotFound, TooManyClasses) as e:
         showWarning(u'{} parsing error: {}'.format(module_name, e.message))
-    except WordNotFoundError, e:
+    except WordNotFoundError as e:
         showWarning(u'{} word not found'.format(module_name, e.message))
     return words

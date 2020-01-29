@@ -4,9 +4,14 @@
 import sys
 import os
 
-from dict_viewer_plugin.utils import create_variations
+if sys.version_info[0] >= 3:
+    unicode = str
 
+sys.path.append(os.path.dirname(__file__))
+sys.path.append(os.path.join(os.path.dirname(__file__), "dict_viewer_plugin"))
 sys.path.append(os.path.join(os.path.dirname(__file__), "dict_viewer_plugin", "site_packages"))
+
+from dict_viewer_plugin.utils import create_variations
 
 import traceback
 import json
@@ -14,6 +19,7 @@ from aqt import mw
 from aqt.utils import showInfo, showWarning
 from aqt.qt import *
 import anki
+from anki.hooks import addHook
 from aqt.editor import Editor
 from anki.hooks import wrap
 from dict_viewer_plugin import cache, main_classes, frequency_list
@@ -63,7 +69,7 @@ class PluginWindow:
         text = text.strip().lower()
         try:
             words = load_word(text)
-        except WordNotFoundError, e:
+        except WordNotFoundError:
             words = []
 
         self.word = text
@@ -301,10 +307,21 @@ def open_plugin_window(self):
     plugin_window.run()
 
 
-def setup_buttons(self):
-    self._addButton("mybutton", lambda s=self: open_plugin_window(self),
-                    text=u"D", tip="dict viewer", key="")
+if sys.version_info[0] < 3:
+    def setup_buttons(self):
+        self._addButton("mybutton", lambda s=self: open_plugin_window(self),
+                        text=u"D", tip="dict viewer", key="")
 
+    Editor.open_plugin_window = open_plugin_window
+    Editor.setupButtons = wrap(Editor.setupButtons, setup_buttons)
 
-Editor.open_plugin_window = open_plugin_window
-Editor.setupButtons = wrap(Editor.setupButtons, setup_buttons)
+else:
+    def addMyButton(buttons, editor):
+        editor._links['dict_viewer'] = open_plugin_window
+        return buttons + [editor._addButton(
+            None, # "icon name",
+            "dict_viewer", # action name
+            "open dict", # tooltip
+            "D" # label
+        )]
+    addHook("setupEditorButtons", addMyButton)

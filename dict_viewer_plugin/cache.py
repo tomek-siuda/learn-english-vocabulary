@@ -1,6 +1,17 @@
 import os
 import random
-import urllib2
+try:
+    # For Python 3.0 and later
+    from urllib.request import urlopen
+except ImportError:
+    # Fall back to Python 2's urllib2
+    from urllib2 import urlopen
+
+try:
+    # Python 2 forward compatibility
+    range = xrange
+except NameError:
+    pass
 
 
 class FileExistsError(Exception):
@@ -9,7 +20,7 @@ class FileExistsError(Exception):
 
 def random_string(length):
     pool = '0123456789abcdef'
-    return ''.join(random.choice(pool) for i in xrange(length))
+    return ''.join(random.choice(pool) for i in range(length))
 
 
 def create_path(filename):
@@ -37,7 +48,7 @@ def remove_file(filename):
 
 
 def download_file(url):
-    response = urllib2.urlopen(url)
+    response = urlopen(url)
     content = response.read()
     return content
 
