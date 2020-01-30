@@ -8,7 +8,6 @@ except ImportError:
     # Fall back to Python 2
     from urllib2 import urlopen
     from urllib2 import HTTPError
-from bs4 import BeautifulSoup
 import parsing_tools
 from dict_viewer_plugin import cache
 
@@ -84,10 +83,12 @@ def parse_html(html):
     word = Word()
     word.source = 'Oxford'
     word.word = parsing_tools.find_single_class(top_container, name_class).text
-    try:
-        word.pos = parsing_tools.find_single_class(top_container, pos_class).string
-    except ClassNotFound:
-        word.pos = 'undefined'
+
+    pos = top_container.find_all(class_=pos_class)
+    if len(pos) > 0:
+        word.pos = ', '.join([p.string for p in pos])
+    else:
+        word.pos = ''
 
     pos_additionals = []
     for c in pos_additional_classes:

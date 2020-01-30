@@ -146,10 +146,13 @@ def parse_html(html):
         if word.find(class_='bussdictEntry'):
             word_object.source = 'Longman Business'
         word_object.word = parsing_tools.find_single_class(word_head, name_class).string.replace(u'‧', u'')
-        try:
-            word_object.pos = parsing_tools.find_single_class(word_head, pos_class).string.strip()
-        except ClassNotFound:
+
+        pos = word_head.find_all(class_=pos_class)
+        if len(pos) > 0:
+            word_object.pos = ', '.join([p.text.replace(',', '').strip() for p in pos])
+        else:
             word_object.pos = ''
+
         try:
             word_object.pos_additional = parsing_tools\
                 .find_single_class(word_head, pos_additional_class).text.strip()
