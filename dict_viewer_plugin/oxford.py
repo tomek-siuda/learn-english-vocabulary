@@ -106,17 +106,24 @@ def parse_html(html):
         for pron_collection in pron_collections:
             prons = pron_collection.find_all('div', recursive=False)
             for pron in prons:
-                ipa = Ipa()
-                try:
-                    ipa_content = parsing_tools.find_single_class(pron, ipa_class)
-                except ClassNotFound:
-                    pass
-                else:
-                    ipa.ipa = extract_ipa(ipa_content.text)
+                ipas = []
+                ipa_contents = pron.find_all(class_=ipa_class)
+                for i, ipa_content in enumerate(ipa_contents):
+                    if len(ipas) == i:
+                        ipas.append(Ipa())
+                    ipas[i].ipa = extract_ipa(ipa_content.text)
 
-                audio_div = parsing_tools.find_single_class(pron, audio_class)
-                audio_url = audio_div[audio_url_param_name]
-                ipa.audio = cache.File(audio_url, 'mp3')
+                audio_divs = pron.find_all(class_=audio_class)
+                for i, audio_div in enumerate(audio_divs):
+                    if len(ipas) == i:
+                        ipas.append(Ipa())
+                    audio_url = audio_div[audio_url_param_name]
+                    ipas[i].audio = cache.File(audio_url, 'mp3')
+
+                if len(ipas) > 1 and (len(ipa_contents) != len(audio_divs)):
+                    raise ParseError("Found multiple pronunciations for a region, "
+                                     "but audio and ipa length are different.")
+
                 try:
                     geo = pron['geo']
                 except KeyError:
@@ -124,17 +131,23 @@ def parse_html(html):
                 if 'br' in geo and 'am' in geo:
                     raise ParseError("Can't decide if IPA is UK or US, geo name: '{}'".format(geo))
                 if 'br' in geo:
-                    ipa.region = 'BR'
+                    for ipa in ipas:
+                        ipa.region = 'BR'
                 elif 'am' in geo:
-                    ipa.region = 'US'
+                    for ipa in ipas:
+                        ipa.region = 'US'
                 else:
                     raise ParseError("Can't decide if IPA is UK or US, geo name: '{}'".format(geo))
+
                 pron_section = pron.find_parent(class_=verb_form_root_class)
                 if pron_section:
                     description_words = pron_section.find(class_=verb_form_description_class).text.split(' ')
                     description_words[-1] = '<b>' + description_words[-1] + '</b>'
-                    ipa.description = ' '.join(description_words)
-                word.ipas.append(ipa)
+                    for ipa in ipas:
+                        ipa.description = ' '.join(description_words)
+
+                for ipa in ipas:
+                    word.ipas.append(ipa)
 
     # remove idiom div, it also has definitions we don't need
     idiom_div = soup.find(class_=idioms_parent)
