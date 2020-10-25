@@ -8,6 +8,7 @@ except ImportError:
     # Fall back to Python 2
     from urllib2 import urlopen
     from urllib2 import HTTPError
+    from urllib2 import Request
 import parsing_tools
 from dict_viewer_plugin import cache
 
@@ -17,7 +18,10 @@ from main_classes import ParseError, ClassNotFound, TooManyClasses, \
 
 def download(url):
     try:
-        response = urlopen(url)
+        user_agent = 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
+        headers = {'User-Agent': user_agent}
+        r = Request(url, headers=headers)
+        response = urlopen(r)
     except HTTPError as e:
         if e.code == 404:
             raise WordNotFoundError('')

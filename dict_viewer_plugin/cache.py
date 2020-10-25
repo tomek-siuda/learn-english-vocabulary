@@ -6,6 +6,7 @@ try:
 except ImportError:
     # Fall back to Python 2's urllib2
     from urllib2 import urlopen
+    from urllib2 import Request
 
 try:
     # Python 2 forward compatibility
@@ -48,7 +49,10 @@ def remove_file(filename):
 
 
 def download_file(url):
-    response = urlopen(url)
+    user_agent = 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
+    headers = {'User-Agent': user_agent}
+    r = Request(url, headers=headers)
+    response = urlopen(r)
     content = response.read()
     return content
 

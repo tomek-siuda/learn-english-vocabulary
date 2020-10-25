@@ -9,6 +9,7 @@ except ImportError:
     # Fall back to Python 2
     from urllib2 import urlopen
     from urllib2 import HTTPError
+    from urllib2 import Request
 import parsing_tools
 import cache
 
@@ -38,7 +39,10 @@ def load_word(word):
     url = 'https://www.ldoceonline.com/dictionary/'
     url += word
     try:
-        response = urlopen(url)
+        user_agent = 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
+        headers = {'User-Agent': user_agent}
+        r = Request(url, headers=headers)
+        response = urlopen(r)
     except HTTPError as e:
         if e.code == 404:
             raise WordNotFoundError('', word)

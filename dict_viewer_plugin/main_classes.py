@@ -56,6 +56,9 @@ class WordNotFoundError(Exception):
         super(Exception, self).__init__(message)
         self.word = word
 
+class DownloadError(Exception):
+    pass
+
 
 class SectionType:
     NAME = 0
